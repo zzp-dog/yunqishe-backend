@@ -1,9 +1,9 @@
-package com.zx.yunqishe.common.aop;
+package com.zx.yunqishe.trunk.other.aop;
 
-import com.zx.yunqishe.common.annotation.Decrypt;
-import com.zx.yunqishe.common.entity.ResponseData;
-import com.zx.yunqishe.common.exception.UserException;
-import com.zx.yunqishe.common.utils.EncryptUtil;
+import com.zx.yunqishe.trunk.other.annotation.Decrypt;
+import com.zx.yunqishe.trunk.entity.ResponseData;
+import com.zx.yunqishe.trunk.other.exception.UserException;
+import com.zx.yunqishe.trunk.other.utils.EncryptUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -12,7 +12,6 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;

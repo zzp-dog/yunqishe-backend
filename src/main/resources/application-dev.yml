@@ -17,9 +17,9 @@ spring:
           exclude: WEB-INF/**
 
 mybatis:
-    mapper-locations: classpath:mappers/*Mapper.xml
+    mapper-locations: classpath:mapper/*Mapper.xml
     # rmapper.xml文件中resultMap的type或者parameterType或者resultType会使用程序里定义的pojo的包名
-    type-aliases-package: com.zx.yunqishe.common.entity
+    type-aliases-package: com.zx.yunqishe.trunkentity
     configuration:
       # 下划线转驼峰
       map-underscore-to-camel-case: true

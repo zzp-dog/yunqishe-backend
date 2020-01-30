@@ -1,17 +1,12 @@
-package com.zx.yunqishe.security.controller;
+package com.zx.yunqishe.trunk.controller;
 
-import com.zx.yunqishe.common.annotation.Decrypt;
-import com.zx.yunqishe.common.annotation.Encrypt;
-import com.zx.yunqishe.common.entity.ResponseData;
-import com.zx.yunqishe.common.exception.UserException;
-import com.zx.yunqishe.common.utils.EncryptUtil;
+import com.zx.yunqishe.trunk.entity.ResponseData;
+import com.zx.yunqishe.trunk.other.exception.UserException;
+import com.zx.yunqishe.trunk.other.utils.EncryptUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Base64;
-import java.util.Map;
 
 /**
  * app启动初始化请求控制器

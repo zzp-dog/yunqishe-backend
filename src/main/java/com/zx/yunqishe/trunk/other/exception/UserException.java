@@ -1,6 +1,6 @@
-package com.zx.yunqishe.common.exception;
+package com.zx.yunqishe.trunk.other.exception;
 
-import com.zx.yunqishe.common.entity.ResponseData;
+import com.zx.yunqishe.trunk.entity.ResponseData;
 
 /**
  * 自定义异常类

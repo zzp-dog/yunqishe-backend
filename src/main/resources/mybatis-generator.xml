@@ -11,27 +11,27 @@
 
         <!-- 配置 tk.mybatis 插件 这边value指向mybatis通用接口 -->
         <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
-            <property name="mappers" value="tk.mybatis.MyMapper"/>
+            <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>
         </plugin>
 
         <!-- 配置数据库连接 -->
         <jdbcConnection
                 driverClass="com.mysql.jdbc.Driver"
-                connectionURL="http://127.0.0.1:3306/zx_yqs"
+                connectionURL="jdbc:mysql://127.0.0.1:3306/zx_yqs"
                 userId="root"
                 password="root">
             <property name="nullCatalogMeansCurrent" value="true" />
         </jdbcConnection>
 
         <!-- 配置实体类存放路径  请自定义创建该目录-->
-        <javaModelGenerator targetPackage="com.zx.yunqishe.common.entity" targetProject="src/main/java"/>
+        <javaModelGenerator targetPackage="com.zx.yunqishe.trunk.entity" targetProject="src/main/java"/>
 
         <!-- 配置 XML 存放路径 在资源文件中创建mapper目录 -->
         <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources"/>
 
         <!-- 配置 DAO 存放路径 -->
         <javaClientGenerator
-                targetPackage="com.zx.yunqishe.temp.mapper"
+                targetPackage="com.zx.yunqishe.trunk.dao"
                 targetProject="src/main/java"
                 type="XMLMAPPER"/>
 

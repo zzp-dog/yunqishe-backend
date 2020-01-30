@@ -1,4 +1,4 @@
-package com.zx.yunqishe.common.annotation;
+package com.zx.yunqishe.trunk.other.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

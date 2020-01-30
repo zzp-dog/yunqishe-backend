@@ -1,8 +1,8 @@
-package com.zx.yunqishe.protal.user.controller;
+package com.zx.yunqishe.branches.protal.user;
 
-import com.zx.yunqishe.common.annotation.Decrypt;
-import com.zx.yunqishe.common.entity.ResponseData;
-import com.zx.yunqishe.common.entity.User;
+import com.zx.yunqishe.trunk.other.annotation.Decrypt;
+import com.zx.yunqishe.trunk.entity.ResponseData;
+import com.zx.yunqishe.trunk.entity.User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

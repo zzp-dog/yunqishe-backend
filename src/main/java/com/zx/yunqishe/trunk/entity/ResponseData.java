@@ -1,4 +1,4 @@
-package com.zx.yunqishe.common.entity;
+package com.zx.yunqishe.trunk.entity;
 
 import java.util.HashMap;
 import java.util.Map;

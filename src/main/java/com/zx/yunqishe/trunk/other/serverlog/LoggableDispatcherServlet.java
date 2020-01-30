@@ -1,4 +1,4 @@
-package com.zx.yunqishe.common.serverlog;
+package com.zx.yunqishe.trunk.other.serverlog;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;

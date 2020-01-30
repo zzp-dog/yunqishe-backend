@@ -1,7 +1,5 @@
-package com.zx.yunqishe.common.serverlog;
+package com.zx.yunqishe.trunk.other.serverlog;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
