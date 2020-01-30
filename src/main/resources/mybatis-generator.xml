@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+    <context id="Mysql" targetRuntime="MyBatis3Simple" defaultModelType="flat">
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <!-- 配置 tk.mybatis 插件 这边value指向mybatis通用接口 -->
+        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+            <property name="mappers" value="tk.mybatis.MyMapper"/>
+        </plugin>
+
+        <!-- 配置数据库连接 -->
+        <jdbcConnection
+                driverClass="com.mysql.jdbc.Driver"
+                connectionURL="http://127.0.0.1:3306/zx_yqs"
+                userId="root"
+                password="root">
+            <property name="nullCatalogMeansCurrent" value="true" />
+        </jdbcConnection>
+
+        <!-- 配置实体类存放路径  请自定义创建该目录-->
+        <javaModelGenerator targetPackage="com.zx.yunqishe.common.entity" targetProject="src/main/java"/>
+
+        <!-- 配置 XML 存放路径 在资源文件中创建mapper目录 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources"/>
+
+        <!-- 配置 DAO 存放路径 -->
+        <javaClientGenerator
+                targetPackage="com.zx.yunqishe.temp.mapper"
+                targetProject="src/main/java"
+                type="XMLMAPPER"/>
+
+
+        <!-- 配置需要指定生成的数据库和表，% 代表所有表，
+        这里mysql使用catalog可能不能使用  这里可以指定其他数据库-->
+        <table  tableName="%">
+            <!-- mysql 配置  column为主键名  -->
+            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
+        </table>
+    </context>
+</generatorConfiguration>
