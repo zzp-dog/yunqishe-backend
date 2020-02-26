@@ -24,14 +24,14 @@
         </jdbcConnection>
 
         <!-- 配置实体类存放路径  请自定义创建该目录-->
-        <javaModelGenerator targetPackage="com.zx.yunqishe.trunk.entity" targetProject="src/main/java"/>
+        <javaModelGenerator targetPackage="com.zx.yunqishe.entity" targetProject="src/main/java"/>
 
         <!-- 配置 XML 存放路径 在资源文件中创建mapper目录 -->
         <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources"/>
 
         <!-- 配置 DAO 存放路径 -->
         <javaClientGenerator
-                targetPackage="com.zx.yunqishe.trunk.dao"
+                targetPackage="com.zx.yunqishe.dao"
                 targetProject="src/main/java"
                 type="XMLMAPPER"/>
 

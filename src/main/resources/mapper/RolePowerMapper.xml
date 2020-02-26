@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.RolePowerMapper">
+    <resultMap id="BaseResultMap" type="com.zx.yunqishe.entity.RoelPower">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="role_id" jdbcType="INTEGER" property="roleId"/>
+        <result column="power_id" jdbcType="INTEGER" property="powerId"/>
+    </resultMap>
+    <!--批量插入角色的权限-->
+    <insert id="batchInsert">
+        insert into role_power(role_id,power_id) VALUES
+        <foreach collection="powers" item="power" separator=",">
+            (#{rid} , #{power.id})
+        </foreach>
+    </insert>
+</mapper>

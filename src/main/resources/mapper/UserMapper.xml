@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.UserMapper">
+    <!--五表联查绑定结果，注意不能省略集合的ofType-->
+    <resultMap id="userWithRolesWithPowers" type="User">
+        <id column="id" property="id"/>
+        <collection property="roles" ofType="Role">
+            <result column="rname" property="name"/>
+            <collection property="powers" ofType="Power">
+                <result column="pname" property="name"/>
+            </collection>
+        </collection>
+    </resultMap>
+    <!--查用户带角色,分页的时候要使用子查询，否则分页结果不正确-->
+    <resultMap id="userWithRoles" type="User">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avator" property="avator"/>
+        <result column="account" property="account"/>
+        <result column="age" property="age"/>
+        <result column="sex" property="sex"/>
+        <result column="qq" property="qq"/>
+        <result column="wechat" property="wechat"/>
+        <result column="email" property="email"/>
+        <result column="coin" property="con"/>
+        <result column="status" property="status"/>
+        <result column="designation" property="designation"/>
+        <result column="experience" property="experience"/>
+        <result column="address" property="address"/>
+        <result column="say" property="say"/>
+        <result column="phone" property="phone"/>
+        <result column="last_login_ip" property="lastLoginIp"/>
+        <result column="last_logout_ip" property="lastLogoutIp"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="last_logout_time" property="lastLogoutTime"/>
+        <result column="last_login_device" property="lastLoginDevice"/>
+        <result column="last_logout_device" property="lastLogoutDevice"/>
+        <result column="role_id"/>
+        <!--将id传入userId作为子查询语句的条件-->
+        <collection property="roles" ofType="Role" column="{userId=id,roleId=role_id}" select="selectUserRoles">
+        </collection>
+    </resultMap>
+    <!--用户角色和角色内连接查询结果,作为上面的子查询-->
+    <resultMap id="userRoleWithRole" type="Role">
+        <id column="id" property="id"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="pid" property="pid"/>
+    </resultMap>
+
+    <!--用户角色,一对多查询结果-->
+    <resultMap id="userWithRoles2" type="User">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avator" property="avator"/>
+        <result column="account" property="account"/>
+        <result column="age" property="age"/>
+        <result column="sex" property="sex"/>
+        <result column="qq" property="qq"/>
+        <result column="wechat" property="wechat"/>
+        <result column="email" property="email"/>
+        <result column="coin" property="con"/>
+        <result column="status" property="status"/>
+        <result column="designation" property="designation"/>
+        <result column="experience" property="experience"/>
+        <result column="address" property="address"/>
+        <result column="say" property="say"/>
+        <result column="phone" property="phone"/>
+        <result column="last_login_ip" property="lastLoginIp"/>
+        <result column="last_logout_ip" property="lastLogoutIp"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="last_logout_time" property="lastLogoutTime"/>
+        <result column="last_login_device" property="lastLoginDevice"/>
+        <result column="last_logout_device" property="lastLogoutDevice"/>
+        <result column="role_id"/>
+        <!--将id传入userId作为子查询语句的条件-->
+        <collection property="roles" ofType="Role">
+            <id column="rid" property="id"/>
+            <result column="description" property="description"/>
+            <result column="create_time" property="createTime"/>
+            <result column="pid" property="pid"/>
+        </collection>
+    </resultMap>
+
+    <!--这个地方属性名不能重复，否则会出现绑定混乱的情况。。。-->
+    <select id="getUserRolePower" resultMap="userWithRolesWithPowers">
+        SELECT
+            a.id,
+            c.NAME as rname,
+            e.NAME as pname
+        FROM
+            USER a
+            INNER JOIN user_role b ON a.id = b.user_id
+            INNER JOIN role c ON b.role_id = c.id
+            INNER JOIN role_power d ON c.id = d.role_id
+            INNER JOIN power e ON d.power_id = e.id
+        WHERE
+            a.account = #{account};
+     </select>
+    <!--根据用户id，角色id查角色-->
+    <select id="selectUserRoles" resultMap="userRoleWithRole">
+        SELECT a.id, a.description,a.create_time,a.pid
+        FROM role a
+        INNER  JOIN user_role b on a.id = b.role_id
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="userId != null">
+                    AND b.user_id = #{userId}
+                </if>
+                <if test='roleId != null and !roleId.equals("null")'>
+                    AND a.id = #{roleId}
+                </if>
+            </trim>
+        </where>
+    </select>
+    <!--条件查询用户带角色，关联了子查询查用户角色-->
+    <select id="userSelectList" resultMap="userWithRoles">
+        SELECT
+        a.id,a.avator, a.name,a.nickname,a.sex,a.status
+        ,#{roleId} as role_id
+        from user a
+        <where>
+            <trim prefixOverrides="AND">
+                <if test='name != null and name !=""'>
+                    AND a.name like #{name}
+                </if>
+                <if test='nickname != null and nickname !=""'>
+                    AND a.nickname like #{nickname}
+                </if>
+                <if test='sex != null'>
+                    AND a.sex = #{sex}
+                </if>
+                <if test='status != null'>
+                    AND a.status = #{status}
+                </if>
+                <!-- 如果没有status则设置不显示已回收的用户 status=5 表示在回收站 -->
+                <if test="status == null">
+                    AND a.status != 5
+                </if>
+            </trim>
+        </where>
+    </select>
+    <!--批量更新用户-->
+    <update id="batchUpdate" parameterType="java.util.List">
+        <foreach collection="users" item="user" index="index" open="" close="" separator=";">
+            UPDATE user
+            <set>
+                <if test='user.status != null'>
+                    status = #{user.status},
+                </if>
+                <if test='user.name != null and user.name != ""'>
+                    name = #{user.name},
+                </if>
+                <if test='user.account != null and user.account != ""'>
+                    account = #{user.account},
+                </if>
+                <if test='user.password != null and user.password != ""'>
+                    password = #{user.password},
+                </if>
+                <if test='user.nickname != null and user.nickname != ""'>
+                    nickname = #{user.nickname},
+                </if>
+                <if test='user.avator != null and user.avator != ""'>
+                    avator = #{user.avator},
+                </if>
+                <if test='user.age != null'>
+                    age = #{user.age},
+                </if>
+                <if test='user.address != null and user.address != ""'>
+                    address = #{user.address},
+                </if>
+                <if test='user.qq != null and user.qq != ""'>
+                    qq = #{user.qq},
+                </if>
+                <if test='user.say != null and user.say != ""'>
+                    say = #{user.say},
+                </if>
+                <if test='user.wechat != null and user.wechat != ""'>
+                    wechat = #{user.wechat},
+                </if>
+                <if test='user.phone != null and user.phone != ""'>
+                    phone = #{user.phone},
+                </if>
+                <if test='user.email != null and user.email != ""'>
+                    email = #{user.email},
+                </if>
+                <if test='user.coin != null '>
+                    coin = #{user.coin},
+                </if>
+                <if test='user.designation != null and user.designation != ""'>
+                    designation = #{user.designation},
+                </if>
+                <if test='user.experience != null'>
+                    experience = #{user.experience},
+                </if>
+                <if test='user.lastLoginIp != null and user.lastLoginIp != ""'>
+                    last_login_ip = #{user.lastLoginIp},
+                </if>
+                <if test='user.lastLoginTime != null and user.lastLoginTime != ""'>
+                    last_login_time = #{user.lastLoginTime},
+                </if>
+                <if test='user.lastLoginDevice != null'>
+                    last_login_device = #{user.lastLoginDevice},
+                </if>
+                <if test='user.lastLogoutIp != null and user.lastLogoutIp != ""'>
+                    last_logout_ip = #{user.lastLogoutIp},
+                </if>
+                <if test='user.lastLogoutTime != null and user.lastLogoutTime != ""'>
+                    last_logout_time = #{user.lastLogoutTime},
+                </if>
+                <if test='user.lastLogoutDevice != null'>
+                    last_logout_device = #{user.lastLogoutDevice},
+                </if>
+            </set>
+            WHERE id = #{user.id}
+        </foreach>
+    </update>
+    <!--查询单条用户信息-->
+    <select id="selectOneByPrimary" resultMap="userWithRoles">
+        SELECT
+            a.*,
+            c.id AS rid,
+            c.description,
+            c.create_time,
+            c.pid
+        FROM
+            USER a
+            LEFT JOIN user_role b ON a.id = b.user_id
+            LEFT JOIN role c ON b.role_id = c.id
+        WHERE
+            a.id = #{id};
+    </select>
+
+    <!--批量查询用户角色-->
+    <select id="selectUserRolesIn">
+        SELECT a.id,c.id rid,c.pid FROM user a INNER  JOIN user_role b
+        ON a.id = b.user_id INNER  JOIN role c ON c.id = b.role_id
+        <where>
+            <foreach collection="ids" item="id" separator="," close=")" open="(">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+</mapper>

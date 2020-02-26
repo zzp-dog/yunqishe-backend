@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.SiteSystemMapper">
+  <resultMap id="BaseResultMap" type="com.zx.yunqishe.entity.SiteSystem">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="site_name" jdbcType="VARCHAR" property="siteName" />
+    <result column="keep_days" jdbcType="INTEGER" property="keepDays" />
+    <result column="regist_verify_way" jdbcType="TINYINT" property="registVerifyWay" />
+    <result column="sign_up" jdbcType="TINYINT" property="signUp" />
+    <result column="sign_in" jdbcType="TINYINT" property="signIn" />
+    <result column="version" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+</mapper>
