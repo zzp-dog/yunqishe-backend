@@ -36,8 +36,8 @@ public class DocArticle {
     /**
      * 浏览次数
      */
-    @Column(name = "view_count")
-    private Integer viewCount;
+    @Column(name = "view")
+    private Integer view;
 
     /**
      * 1-可见，0-不可见
@@ -154,19 +154,19 @@ public class DocArticle {
     /**
      * 获取浏览次数
      *
-     * @return view_count - 浏览次数
+     * @return view - 浏览次数
      */
-    public Integer getViewCount() {
-        return viewCount;
+    public Integer getView() {
+        return view;
     }
 
     /**
      * 设置浏览次数
      *
-     * @param viewCount 浏览次数
+     * @param view 浏览次数
      */
-    public void setViewCount(Integer viewCount) {
-        this.viewCount = viewCount;
+    public void setView(Integer view) {
+        this.view = view;
     }
 
     /**

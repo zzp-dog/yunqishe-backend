@@ -68,9 +68,9 @@ public class PowerService {
     public ResponseData powerUpdate(Power power) {
         Integer id = power.getId();
         Integer pid = power.getPid();
-        // 检查pid是否为自身id或子孙id
-        if(!validPid(id, pid)) {
-            return ResponseData.error(ErrorMsg.POWER_PID_ERROR);
+        // 设置父权限时，不能是同级或子级权限
+        if(!validPower(id, pid)) {
+            return ResponseData.error(ErrorMsg.PARENT_BOUND);
         }
         powerMapper.updateByPrimaryKeySelective(power);
         return ResponseData.success();
@@ -112,7 +112,7 @@ public class PowerService {
      * @param pid 父id
      * @return true - pid不为子孙或自身id  false-pid为子孙或自身id
      */
-    private boolean validPid(Integer id, Integer pid) {
+    private boolean validPower(Integer id, Integer pid) {
         // 0.查询所有权限
         List<Power> powers = powerMapper.selectAll();
         if(powers==null)return false;

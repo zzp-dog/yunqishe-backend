@@ -95,11 +95,9 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
                 throw new UserException(ErrorMsg.SK_EXPIRE_ERROR);
             }
             this.httpHeaders = inputMessage.getHeaders();
-            String mes = inputStream2Str(inputMessage.getBody());
-            // xss
-
-            this.body = new ByteArrayInputStream(
-                    EncryptUtil.AESDecrypt(mes, sk).getBytes());
+            String cip = inputStream2Str(inputMessage.getBody());
+            String mes = EncryptUtil.AESDecrypt(cip, sk);
+            this.body = new ByteArrayInputStream(mes.getBytes());
         }
         @Override
         public InputStream getBody(){

@@ -104,7 +104,7 @@ public class GlobalExceptionHandler {
             if (null != t)msg = t.getMessage();
         }
 
-        return ResponseData.error(ErrorMsg.ERROR_500).add("cause",null==msg? e.getMessage():msg);
+        return ResponseData.error(ErrorMsg.ERROR_500).add("tip",null==msg? e.getMessage():msg);
     }
 
     /**

@@ -12,7 +12,6 @@ import com.zx.yunqishe.entity.User;
 import com.zx.yunqishe.entity.extral.req.SingleUser;
 import com.zx.yunqishe.service.user.UserService;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -45,13 +44,8 @@ public class UserController {
      * @return
      */
     @RequestMapping(API.IS_RECORD)
-    public ResponseData isOnline() {
-        Subject subject = SecurityUtils.getSubject();
-        // 备注：已登录认证和记住我互斥
-        if (subject.isAuthenticated() || subject.isRemembered()) {
-            return ResponseData.success();
-        }
-        return ResponseData.error(ErrorMsg.TOKEN_ERROR);
+    public ResponseData isRecord(){
+        return userService.isRecord();
     }
 
     /**
@@ -98,6 +92,7 @@ public class UserController {
     @Decrypt
     @PostMapping(API.REGIST)
     public ResponseData regist(@RequestBody @Valid User user) {
+        // rid：6 - 普通用户
         ResponseData rd = userService.regist(user, 6);
         if (rd.getStatus() == 400) return rd;
         // 注册成功后去请求登录api
@@ -112,8 +107,8 @@ public class UserController {
      * @return
      */
     @GetMapping(API.LOGOUT)
-    public ResponseData logout() {
-        return userService.logout();
+    public ResponseData logout(HttpServletResponse res) {
+        return userService.logout(res);
     }
 
     /**
@@ -148,24 +143,24 @@ public class UserController {
     @Encrypt
     @GetMapping(API.SELECT+ API.LIST)
     @RequiresPermissions("rbac:user:select")
-    public ResponseData userSelectList(@RequestParam(defaultValue = "1") Integer pageNum,
+    public ResponseData selectUsersWithRolesByConditions(@RequestParam(defaultValue = "1") Integer pageNum,
                                        @RequestParam(defaultValue = "10") Integer pageSize,
                                        @RequestParam(required = false) String name,
                                        @RequestParam(required = false) Integer sex,
                                        @RequestParam(required = false) String nickname,
                                        @RequestParam(required = false) Integer status,
                                        @RequestParam(required = false) Integer roleId) {
-        Map<String, Object> map = new HashMap(5);
+        Map<String, Object> map = new HashMap(8);
         map.put("sex",sex);
-        map.put("name",name);
         map.put("status",status);
         map.put("roleId",roleId);
-        map.put("nickname",nickname);
+        map.put("name",name!=null?"%" + name + "%":null);
+        map.put("nickname",nickname!=null?"%" + nickname+"%":nickname);
 
         PageHelper.startPage(pageNum, pageSize);
-        List<User> list = userService.userSelectList(map);
+        List<User> list = userService.selectUsersWithRolesByConditions(map);
         PageInfo<User> pageInfo = new PageInfo<>(list);
-        return ResponseData.success().add("users", pageInfo.getList());
+        return ResponseData.success().add("pageInfo", pageInfo);
     }
 
     /**
@@ -208,7 +203,7 @@ public class UserController {
     }
 
     /**
-     * 单个或批量更新用户角色和状态，且只能更s新角色和状态，
+     * 非内置账号status：4时，只能单个或批量更新用户角色和状态
      * 其他不能更改，否则算作侵犯隐私
      * @param users
      * @return
@@ -221,5 +216,16 @@ public class UserController {
         return userService.userBatchUpdate(users);
     }
 
+    /**
+     * 管理员的资料修改
+     * @param admin
+     * @return
+     */
+    @Decrypt
+    @PostMapping(API.BACKEND+API.UPDATE + API.ONE)
+    @RequiresUser
+    public ResponseData userBackendUpdateOne(@RequestBody User admin, HttpServletRequest req) {
+        return userService.updateAdminBaseInfo(admin, req);
+    }
 
 }

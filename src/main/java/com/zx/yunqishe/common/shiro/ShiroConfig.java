@@ -41,7 +41,13 @@ public class ShiroConfig {
             API.USER + API.REGIST,
             API.USER + API.INSTALL,
             API.USER + API.LOGIN,
-            API.USER + API.LOGOUT
+            API.USER + API.LOGOUT,
+            API.TOPIC + API.FRONTEND + API.SELECT + API.ONE,
+            API.TOPIC + API.FRONTEND + API.SELECT + API.LIST,
+            API.TOPIC_CONTENT + API.FRONTEND + API.SELECT + API.ONE,
+            API.TOPIC_CONTENT + API.FRONTEND + API.SELECT + API.LIST,
+            API.TOPIC_COMMENT + API.FRONTEND + API.SELECT + API.ONE,
+            API.TOPIC_COMMENT + API.FRONTEND + API.SELECT + API.LIST
     };
 
     @Bean(name = "shiroFilter")
@@ -79,6 +85,7 @@ public class ShiroConfig {
         CustomRealm customRealm = new CustomRealm();
         // customRealm注入缓存管理器
         customRealm.setCacheManager(ehCacheManager);
+        //告诉realm,使用credentialsMatcher加密算法类来验证密文
         return customRealm;
     }
 
@@ -136,8 +143,8 @@ public class ShiroConfig {
     @Bean
     public CookieRememberMeManager rememberMeManager(SimpleCookie simpleCookie){
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
-        //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)
-        cookieRememberMeManager.setCipherKey(Base64.decode("2AvVhdsgUs0FSA3SDFAdag=="));
+        //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 字节数组长度要求16
+        cookieRememberMeManager.setCipherKey("zzp0113636044291".getBytes());
         cookieRememberMeManager.setCookie(simpleCookie);
         return cookieRememberMeManager;
     }

@@ -7,6 +7,8 @@ import com.zx.yunqishe.dao.RolePowerMapper;
 import com.zx.yunqishe.dao.UserRoleMapper;
 import com.zx.yunqishe.entity.*;
 import com.zx.yunqishe.entity.extral.res.SimplePower;
+import com.zx.yunqishe.service.user.UserService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,9 @@ public class RoleService {
     private PowerMapper powerMapper;
     @Autowired
     private UserRoleMapper userRoleMapper;
+    // 要使用到用户服务的校验角色是否越界的方法
+    @Autowired
+    private UserService userService;
 
     /**
      * 查询所有角色
@@ -48,12 +53,12 @@ public class RoleService {
         // 插入角色并返回id
         roleMapper.insertSelective(role);
         Integer id = role.getId();
-        // 设置了权限
+        // 给设置了权限
         List<Power> powers = role.getPowers();
         if(powers !=null && powers.isEmpty()){
-            // 检查权限是否父权限的子权限
-            if(!validPid(role.getPid(), powers)) {
-                return ResponseData.error(ErrorMsg.ROLE_POWER_BOUND);
+            // 检查权限是否上级父角色权限的子权限！！！
+            if(!validPower(role.getPid(), powers)) {
+                return ResponseData.error(ErrorMsg.POWER_BOUND);
             }
             rolePowerMapper.batchInsert(id, powers);
         }
@@ -67,7 +72,7 @@ public class RoleService {
      * @param powers 要设置的角色
      * @return
      */
-    private boolean validPid(Integer pid, List<Power> powers) {
+    private boolean validPower(Integer pid, List<Power> powers) {
        // 没有设置权限,返回false
         if(powers == null) return true;
         // 查询父角色及其权限集合
@@ -98,9 +103,9 @@ public class RoleService {
             }
             powerList.add($power);
         }
-        // 找出父角色所有权限[包含子孙权限和权限本身]存贮至pmap
+        // 找出父角色所有权限[子孙权限，不含自身]存贮至pmap
         Map<Integer,Power> pmap = new HashMap<>();
-        // 遍历父权限找自身和子孙节点
+        // 遍历父权限找子孙节点
         setMap(pmap,allmap,ppowers);
         // 判断父节点所有权限是否包含要设置的权限
         boolean flag = true;
@@ -121,7 +126,6 @@ public class RoleService {
     private final  void setMap(Map<Integer,Power> resultMap, Map<Integer, Power> allMap, List<Power> src) {
         for (Power power : src) {
             Integer id = power.getId();
-            resultMap.put(id, power);
             Power p = allMap.get(id);
             if (p == null)continue;
             getChilds(p, resultMap);
@@ -149,16 +153,22 @@ public class RoleService {
      * @param role
      */
     public ResponseData updateRole(Role role) {
-        // 检查权限是否父权限的子权限
-        if(!validPid(role.getPid(), role.getPowers())) {
-            return ResponseData.error(ErrorMsg.ROLE_POWER_BOUND);
+        // 检查角色是否能被当前用户修改
+        List<Role> roles= new ArrayList<>(1);
+        roles.add(role);
+        if(!userService.validRole(roles)){
+            return ResponseData.error(ErrorMsg.ROLE_BOUND);
+        };
+        // 检查权限是否父角色权限的子权限
+        if(!validPower(role.getPid(), role.getPowers())) {
+            return ResponseData.error(ErrorMsg.POWER_BOUND);
         }
         // 更新角色表
         roleMapper.updateByPrimaryKeySelective(role);
-        Integer rid = role.getId();
         // 删除权限角色
         Example example = new Example(RolePower.class);
         Example.Criteria criteria = example.createCriteria();
+        Integer rid = role.getId();
         criteria.andEqualTo("roleId",rid);
         rolePowerMapper.deleteByExample(example);
         // 有设置权限

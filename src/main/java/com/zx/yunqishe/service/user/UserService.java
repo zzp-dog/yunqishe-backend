@@ -1,10 +1,11 @@
 package com.zx.yunqishe.service.user;
 
 import com.zx.yunqishe.common.consts.ErrorMsg;
+import com.zx.yunqishe.common.utils.CookieUtil;
 import com.zx.yunqishe.common.utils.DateUtil;
+import com.zx.yunqishe.common.utils.EmailUtil;
 import com.zx.yunqishe.common.utils.Generator;
-import com.zx.yunqishe.common.utils.email.EmailUtil;
-import com.zx.yunqishe.common.utils.email.SendEmail;
+import com.zx.yunqishe.common.utils.entity.SendEmail;
 import com.zx.yunqishe.dao.RoleMapper;
 import com.zx.yunqishe.dao.UserMapper;
 import com.zx.yunqishe.dao.UserRoleMapper;
@@ -13,6 +14,7 @@ import com.zx.yunqishe.entity.Role;
 import com.zx.yunqishe.entity.User;
 import com.zx.yunqishe.entity.UserRole;
 import com.zx.yunqishe.entity.extral.req.SingleUser;
+import com.zx.yunqishe.service.CommonService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -22,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,14 +33,14 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class UserService {
+public class UserService extends CommonService{
 
     @Autowired
     private UserRoleMapper userRoleMapper;
-    @Autowired
-    private UserMapper userMapper;
+
     @Autowired
     private RoleMapper roleMapper;
+
     // 创建任务计划线程池
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
 
@@ -85,17 +87,19 @@ public class UserService {
      * @throws Exception
      */
     public ResponseData login(SingleUser suser) {
-        String name = suser.getAccount();
         String pass = suser.getPassword();
+        String account = suser.getAccount();
         Subject subject = SecurityUtils.getSubject();
-        UsernamePasswordToken token = new UsernamePasswordToken(name,pass);
+        UsernamePasswordToken token = new UsernamePasswordToken(account,pass);
         // 执行认证登陆并记住我
         try {
             token.setRememberMe(true);
             subject.login(token);
-            return ResponseData.success();
-        } catch (Exception uae) {
-            return ResponseData.error(ErrorMsg.LOGIN_ERROR);
+            // 查用户简易信息并返回给前端
+            User user = getCurrentBaseUser();
+            return ResponseData.success().add("user", user);
+        } catch (Exception e) {
+            return ResponseData.error(ErrorMsg.LOGIN_ERROR).add("cause", e);
         }
     }
 
@@ -104,9 +108,11 @@ public class UserService {
      * @return
      * @throws Exception
      */
-    public ResponseData logout() {
+    public ResponseData logout(HttpServletResponse res) {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
+        // 清除cookie
+        CookieUtil.removeCookie(res, "rememberMe");
         return ResponseData.success().add("result" ,1);
     }
 
@@ -115,15 +121,12 @@ public class UserService {
      * @return
      */
     public ResponseData qeuryAdmin() {
-        User user = new User();
-        // 超级管理员rid默认为1
-        user.setRoleId(1);
-        int count = userMapper.selectCount(user);
-
+        UserRole userRole = new UserRole();
+        userRole.setRoleId(1); // 超级管理
+        int count = userRoleMapper.selectCount(userRole);
         if (count > 0) {
             return ResponseData.error(ErrorMsg.ADMIN_EXISTS_ERROR);
         }
-
         return ResponseData.success();
     }
 
@@ -163,10 +166,10 @@ public class UserService {
         if (!b) {
             return ResponseData.error(ErrorMsg.SEND_EMAIL_ERROR);
         }
-
-        // 存在session
+        // 该验证码对应的时间戳
         String timeStamp = DateUtil.timeStamp(null).toString();
         Map<String, String> map = new HashMap<String, String>();
+        // 存在session里
         map.put("code", code);
         map.put("timeStamp", timeStamp);
         HttpSession session = req.getSession();
@@ -213,7 +216,7 @@ public class UserService {
      * @param account
      * @return
      */
-    public User getUserRolePower(String account) {
+    public User selectUserWithRolesWithPowers(String account) {
         // 根据账号查所有角色和所有权限
 
         // 因为数据库角色和权限都设计了父子结构，前端会展示成两棵树，
@@ -222,7 +225,7 @@ public class UserService {
         // 限制2：角色分配的权限不能既有父权限，又有子权限，否则权限分配也有问题
         // 所以只要同通过5表左连接查询就能查到用户所有角色和权限
         // 注意：为角色分配权限的时候，要遵循父角色的权限大于子角色权限这个规则。
-        return userMapper.getUserRolePower(account);
+        return userMapper.selectUserWithRolesWithPowers(account);
     }
 
     /**
@@ -237,12 +240,31 @@ public class UserService {
     }
 
     /**
+     * 判断用户登陆状态
+     * @return
+     */
+    public ResponseData isRecord() {
+        Subject subject = SecurityUtils.getSubject();
+        // 备注：已登录认证和记住我互斥
+        if(!subject.isRemembered()&&!subject.isAuthenticated()){
+            return ResponseData.error(ErrorMsg.TOKEN_ERROR);
+        }
+        // 静态机请求后存贮的user，客户端取不到！！！
+        if (subject.isRemembered()) { // 记住我需要重查用户把基本信息放到会话里
+            User user = getCurrentBaseUser();
+            subject.getSession().setAttribute("me", user);
+        }
+        User user = (User)(subject.getSession().getAttribute("me"));
+        return ResponseData.success().add("user", user);
+    }
+
+    /**
      * 查询简单用户信息列表
      * @return
      * @param map
      */
-    public List<User> userSelectList(Map<String, Object> map) {
-        return userMapper.userSelectList(map);
+    public List<User> selectUsersWithRolesByConditions(Map<String, Object> map) {
+        return userMapper.selectUsersWithRolesByConditions(map);
     }
 
     /**
@@ -251,7 +273,7 @@ public class UserService {
      * @param id
      */
     public User userSelectOne(Integer id) {
-        return userMapper.selectOneByPrimary(id);
+        return userMapper.selectUserWithRolesByUserId(id);
     }
 
     /**
@@ -271,7 +293,7 @@ public class UserService {
         for (Integer temp : ids) {
             User u = new User();
             u.setId(temp);
-            u.setStatus((byte)4);
+            u.setStatus((byte)5); // 5 - 表示在回收站
             users.add(u);
         }
         userMapper.batchUpdate(users);
@@ -284,56 +306,144 @@ public class UserService {
      * @return
      */
     public ResponseData userBatchUpdate(List<User> users) {
-        User user  = (User)SecurityUtils.getSubject().getSession().getAttribute("me");
-        Integer id = user.getId();
-        // 获取uid数组链表
+        // 获取用户id数组链表
         List<Integer> ids = new ArrayList<>(users.size());
         for (User user1 : users) {
             ids.add(user1.getId());
         }
         /**
-         * 有父级角色或平级角色则不可修改，
+         * 只能修改为子角色
          * 目前只有超级管理和普通管理可修改
          * */
-        if(!validUpdate(id,ids)) {
-            return ResponseData.error(ErrorMsg.CANNOT_UPDATE);
+        if(!ids.isEmpty()&&!validUsersRole(ids)) {
+            return ResponseData.error(ErrorMsg.ROLE_BOUND);
+        }
+        // 查询是否内置账号
+        Example ex = new Example(User.class);
+        Example.Criteria criteria = ex.createCriteria();
+        criteria.andIn("id", ids);
+        List<User> selectUsers = userMapper.selectByExample(ex);
+        Map<Integer,User> userMap = new HashMap<>(selectUsers.size());
+        for (User selectUser : selectUsers) {
+            Integer id = selectUser.getId();
+            userMap.put(id, selectUser);
+        }
+        // 内置账号可修改所有，其他账号只能改角色和状态
+        for (User user : users) {
+            User oneUser = userMap.get(user.getId());
+            if(oneUser.getStatus() == 4) continue; // 内置账号全可修改
+            User u = new User();
+            u.setId(user.getId());
+            u.setRoles(user.getRoles());
+            u.setStatus(user.getStatus());
+            Integer index = users.indexOf(user);
+            users.set(index, u);
         }
         // 删除用户的角色
         Example example = new Example(UserRole.class);
-        Example.Criteria criteria = example.createCriteria();
+        criteria = example.createCriteria();
         criteria.andIn("userId",ids);
         userRoleMapper.deleteByExample(example);
         // 重新设置用户的角色
-        userRoleMapper.batchInsert(users);
-        // 对于非内置账号，确保只能修改状态和角色
-        for (User user1 : users) {
-            if (user1.getStatus() == 4){ // 内置账号可修改所有
-                continue;
+        // 1.判断是否有角色，避免产生空sql
+        // 2.判断时否有status，避免更新错误
+        for (User user : users) {
+            List<Role> roles = user.getRoles();
+            if(roles == null || roles.isEmpty() ){
+                Role r = new Role();
+                r.setId(7); // 默认设置为游客
+                roles = new ArrayList<>(1);
+                roles.add(r);
+                user.setRoles(roles);
             }
-            User user2 = new User();
-            user2.setRoles(user1.getRoles());
-            user2.setStatus(user1.getStatus());
-            Integer index = users.indexOf(user1);
-            users.set(index, user2);
+            if(user.getStatus() == null) {
+                user.setStatus((byte)-1);
+            }
         }
+        userRoleMapper.batchInsert(users);
+        // 更新用户信息，非内置只能更新状态
         userMapper.batchUpdate(users);
         return ResponseData.success();
     }
 
     /**
-     * 判断是否修改的时子级角色
-     * @param id
-     * @param ids
-     * @return true - 可修改，false-不可修改
+     * 插入用户
+     * @param user
+     * @return
      */
-    private boolean validUpdate(Integer id, List<Integer> ids) {
-        // 没有要更新的用户
-        if(ids == null || ids.isEmpty()) return false;
-        // 查询当前用户所有角色
-        User self = userMapper.selectUserRoles(id);
-        List<Role> sroles = self.getRoles();
+    public ResponseData userInsert(User user) {
+        // 插入用户
+        userMapper.insertSelective(user);
+        // 看是否设置了角色
+        List<Role> roles = user.getRoles();
+        // 角色批量插入
+        if(roles !=null && !roles.isEmpty()) {
+            // 校验角色是否越界
+            if(!validRole(roles)){
+                return ResponseData.error(ErrorMsg.ROLE_BOUND);
+            }
+            List<User> users = new ArrayList<>();
+            users.add(user);
+            userRoleMapper.batchInsert(users);
+        }
+        // 返回操作成功
+        return ResponseData.success();
+    }
+
+    /**
+     * 校验设置的角色是否越界，
+     * 针对单个用户的角色插入或修改
+     * @param roles - 单个用户的批量角色
+     * @return true - 是当前用户的子级角色，false-不是当前用户的子级角色
+     */
+    public boolean validRole(List<Role> roles) {
+        Map<Integer, Role> map = getRolesMap();
+        boolean flag = true;
+        // 单个用户的批量角色检测
+        for (Role role : roles) {
+            flag &= map.get(role.getId()) != null;
+            if(!flag) return false;
+        }
+        return true;
+    }
+
+    /**
+     * 判断要修改的多个或单个用户的角色是否当前角色子级角色
+     * 针对有id的用户的角色修改
+     * @param ids 单个或批量用户的id
+     * @return true - 是当前用户的子级角色，false - 不是当前用户的子级角色
+     */
+    private boolean validUsersRole(List<Integer> ids) {
         // 一次性连接查询出要修改的用户的用户角色集合
-        List<User> users = userMapper.selectUserRolesIn(ids);
+        List<User> users = userMapper.selectUserRolesUserIdIn(ids);
+        Map<Integer,Role> map = getRolesMap();
+        // 判断是否子级角色
+        boolean flag = true;
+        // 批量用户的的批量角色检测
+        for (User user : users) {
+            List<Role> list = user.getRoles();
+            if(list == null || list.isEmpty()) {
+                continue;
+            };
+            // 单个用户的多个角色
+            for (Role role : list) {
+                flag &= map.get(role.getId()) != null;
+                if(!flag)return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 返回当前用户的所有子孙角色map
+     * @return
+     */
+    private Map<Integer, Role> getRolesMap() {
+        User currentUser  = (User)SecurityUtils.getSubject().getSession().getAttribute("me");
+        Integer id = currentUser.getId();
+        // 查询当前用户所有角色
+        User self = userMapper.selectUserWithRolesByUserId(id);
+        List<Role> selfRoles = self.getRoles();
         // 查询所有角色
         List<Role> roles = roleMapper.selectAll();
         // 找当前用户的所有子角色,不包含本身的角色
@@ -358,27 +468,14 @@ public class UserService {
             list.add(role);
         }
         // 找当前用户所有子孙角色节点
-        for (Role srole : sroles) {
+        for (Role srole : selfRoles) {
             Integer rid = srole.getId();
             Role r = allrolesMap.get(rid);
             if (r == null) continue;
             getChilds(r, sallrolesMap);
         }
-        // 判断是否子级角色
-        boolean flag = true;
-        for (User user : users) {
-            List<Role> list = user.getRoles();
-            if(list == null || list.isEmpty()) {
-                continue;
-            };
-            for (Role role : list) {
-                flag &= sallrolesMap.get(role.getId()) != null;
-                if(!flag)return false;
-            }
-        }
-        return flag;
+        return  sallrolesMap;
     }
-
     /**
      * 找子孙角色
      * @param p
@@ -395,21 +492,48 @@ public class UserService {
         }
     }
 
-
     /**
-     * 插入用户
-     * @param user
+     * 更新管理员资料
+     *
+     * 这里就体现了tk.mybatis的不方便之处了，
+     * 针对只准更新部分字段的场景，直接使用有选择的更新就不是那么安全了
+     * 要在服务端重新封装实体或校验后传参，
+     * 如果直接写死固定的sql则不会出现这种风险
+     *
+     * @param admin
+     * @param req
      * @return
      */
-    public ResponseData userInsert(User user) {
-        userMapper.insertSelective(user);
+    public ResponseData updateAdminBaseInfo(User admin, HttpServletRequest req) {
+        User user = getCurrentBaseUser();
+        admin.setId(user.getId());
+
+        String code = admin.getCode();
+        // 修改资料不包含修改密码
+        if (code == null) {
+            userMapper.updateByPrimaryKeySelective(admin);
+            return ResponseData.success();
+        }
+
+        // 获取会话验证码
+        Integer status = 1;
+        Map map = (Map)req.getSession().getAttribute("codeMap");
+        if (map == null) {
+            status = 3;
+        };
+        if (!code.equals(map.get("code"))) {
+            status = 2;
+        };
+        if (status != 1) {
+            return ResponseData.error().add("status", status);
+        }
+
+        // 确保只修改密码
+        User u = new User();
+        u.setId(user.getId());
+        u.setPassword(admin.getPassword());
+        userMapper.updateByPrimaryKeySelective(u);
         return ResponseData.success();
     }
 
-    public static void main(String[] args) {
-        List<?> list = new ArrayList<>();
-        for (Object o : list) {
-            System.out.println(o);
-        }
-    }
 }

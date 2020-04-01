@@ -1,6 +1,7 @@
 package com.zx.yunqishe.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Table(name = "user_role")
 public class UserRole {
@@ -23,6 +24,27 @@ public class UserRole {
     @Column(name = "role_id")
     private Integer roleId;
 
+    @Transient
+    private List<User> users;
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    @Transient
+    private List<Role> roles;
     /**
      * 获取自增id
      *

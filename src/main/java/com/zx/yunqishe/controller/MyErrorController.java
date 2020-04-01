@@ -42,7 +42,7 @@ public class MyErrorController implements ErrorController {
             tip = ErrorMsg.ERROR_500;
         }
         res.setStatus(200);
-        return ResponseData.error(tip).add("code", statusCode);
+        return ResponseData.error(tip);
     }
 
 }

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 // shiro记住我，User类需要实现序列化接口！！！
@@ -31,6 +32,7 @@ public class User implements Serializable{
     /**
      * 姓名
      */
+    @NotBlank
     @Pattern(regexp = RegExp.REG_NAME, message = ErrorMsg.NAME_ERROR)
     @Column(name = "NAME")
     private String name;
@@ -38,6 +40,7 @@ public class User implements Serializable{
     /**
      * 昵称
      */
+    @NotBlank
     @Pattern(regexp = RegExp.REG_OHER_NAME, message = ErrorMsg.NAME_ERROR)
     private String nickname;
 
@@ -94,12 +97,6 @@ public class User implements Serializable{
      */
     @Column(name = "deliver_count")
     private Integer deliverCount;
-
-    /**
-     * 0-普通用户,1-vip,2-版主,3-超级管理
-     */
-    @Column(name = "role_id")
-    private Integer roleId;
 
     /**
      * 等级经验
@@ -160,11 +157,15 @@ public class User implements Serializable{
     /**
      * 账号
      */
+    @NotBlank
+    @Pattern(regexp = RegExp.REG_NAME, message = ErrorMsg.ACCOUNT_ERROR)
     private String account;
 
     /**
      * 密码
      */
+    @NotBlank
+    @Pattern(regexp = RegExp.REG_MD5, message = ErrorMsg.PASSWORD_ERROR)
     @Column(name = "PASSWORD")
     private String password;
 
@@ -185,12 +186,39 @@ public class User implements Serializable{
     @Column(name = "CODE")
     private String code;
 
+    /**
+     * 被关注数
+     */
+    private Integer concern;
+
+    /**
+     * 等级
+     */
+    @Transient
+    private Integer level;
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
     public List<Role> getRoles() {
         return roles;
     }
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public Integer getConcern() {
+        return concern;
+    }
+
+    public void setConcern(Integer concern) {
+        this.concern = concern;
     }
 
     /**
@@ -395,24 +423,6 @@ public class User implements Serializable{
      */
     public void setDeliverCount(Integer deliverCount) {
         this.deliverCount = deliverCount;
-    }
-
-    /**
-     * 获取0-普通用户,1-vip,2-版主,3-超级管理
-     *
-     * @return role_id - 0-普通用户,1-vip,2-版主,3-超级管理
-     */
-    public Integer getRoleId() {
-        return roleId;
-    }
-
-    /**
-     * 设置0-普通用户,1-vip,2-版主,3-超级管理
-     *
-     * @param roleId 0-普通用户,1-vip,2-版主,3-超级管理
-     */
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
     }
 
     /**

@@ -10,13 +10,13 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
 public class CustomRealm extends AuthorizingRealm {
 
     @Autowired
-    @Lazy
     private UserService userService;
 
     /**
@@ -30,11 +30,9 @@ public class CustomRealm extends AuthorizingRealm {
         //获取登录用户名
         String account = (String) principalCollection.getPrimaryPrincipal();
         //根据用户名去数据库查询用户信息
-        User user = userService.getUserRolePower(account);
+        User user = userService.selectUserWithRolesWithPowers(account);
         //添加角色和权限
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
-        // 存储到subject的session里
-        SecurityUtils.getSubject().getSession().setAttribute("me", user);
 
         for (Role role : user.getRoles()) {
             //添加角色
@@ -63,15 +61,16 @@ public class CustomRealm extends AuthorizingRealm {
         if (token.getPrincipal() == null) {
             return null;
         }
-        //获取用户信息
-        String name = token.getUsername();
-        User user = userService.queryUserByAccount(name);
+        //获取用户信息-账号
+        String account = token.getUsername();
+        User user = userService.queryUserByAccount(account);
         if (user == null) {
             //这里返回后会报出对应异常
             return null;
         }
         //这里验证authenticationToken和simpleAuthenticationInfo的信息
-        return new SimpleAuthenticationInfo(name, user.getPassword(), getName());
+        return new SimpleAuthenticationInfo(account, user.getPassword(), getName());
     }
+
 }
 

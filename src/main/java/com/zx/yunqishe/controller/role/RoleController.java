@@ -9,6 +9,7 @@ import com.zx.yunqishe.entity.extral.res.SimplePower;
 import com.zx.yunqishe.service.power.PowerService;
 import com.zx.yunqishe.service.role.RoleService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
+/**
+ * 只允许超级管理进行操作
+ */
 @RestController
 @Validated
 @RequestMapping(API.ROLE)
@@ -30,6 +34,7 @@ public class RoleController {
      * @return
      */
     @Encrypt
+    @RequiresRoles("superAdmin")
     @RequiresPermissions("rbac:role:select")
     @GetMapping(API.SELECT + API.LIST)
     public ResponseData roleSelectList() {
@@ -43,6 +48,7 @@ public class RoleController {
      * @return
      */
     @Encrypt
+    @RequiresRoles("superAdmin")
     @RequiresPermissions("rbac:role:select")
     @GetMapping(API.SELECT)
     public ResponseData roleSelect(@RequestParam Integer id) {
@@ -56,6 +62,7 @@ public class RoleController {
      * @return
      */
     @Decrypt
+    @RequiresRoles("superAdmin")
     @RequiresPermissions("rbac:role:insert")
     @PostMapping(API.INSERT)
     public ResponseData roleInsert(@RequestBody @Valid Role role) {
@@ -68,6 +75,7 @@ public class RoleController {
      * @return
      */
     @Decrypt
+    @RequiresRoles("superAdmin")
     @RequiresPermissions("rbac:role:update")
     @PostMapping(API.UPDATE)
     public ResponseData roleUpdate(@RequestBody @Valid Role role) {
@@ -79,6 +87,8 @@ public class RoleController {
      * @param ids
      * @return
      */
+    @Decrypt
+    @RequiresRoles("superAdmin")
     @RequiresPermissions("rbac:role:delete")
     @PostMapping(API.DELETE)
     public ResponseData roleDelete(@NotEmpty @RequestBody List<Integer> ids){

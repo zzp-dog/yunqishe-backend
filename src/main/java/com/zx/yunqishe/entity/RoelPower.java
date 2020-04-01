@@ -1,6 +1,7 @@
 package com.zx.yunqishe.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Table(name = "roel_power")
 public class RoelPower {
@@ -23,6 +24,27 @@ public class RoelPower {
     @Column(name = "power_id")
     private Integer powerId;
 
+    @Transient
+    private List<Power> powers;
+
+    public List<Power> getPowers() {
+        return powers;
+    }
+
+    public void setPowers(List<Power> powers) {
+        this.powers = powers;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    @Transient
+    private List<Role> roles;
     /**
      * 获取自增id
      *

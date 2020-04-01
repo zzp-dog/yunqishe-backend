@@ -1,4 +1,4 @@
-package com.zx.yunqishe.common.utils.email;
+package com.zx.yunqishe.common.utils;
 
 import java.util.Properties;
 import java.util.concurrent.*;
@@ -11,6 +11,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.zx.yunqishe.common.utils.entity.SendEmail;
 import lombok.extern.slf4j.Slf4j;
 
 

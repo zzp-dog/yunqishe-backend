@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zx.yunqishe.dao.TopicMapper">
-  <resultMap id="BaseResultMap" type="com.zx.yunqishe.entity.Topic">
-    <!--
-      WARNING - @mbg.generated
-    -->
+  <resultMap id="topic" type="com.zx.yunqishe.entity.Topic">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="sid" jdbcType="TINYINT" property="sid" />
     <result column="uid" jdbcType="INTEGER" property="uid" />
@@ -12,5 +9,118 @@
     <result column="visible" jdbcType="TINYINT" property="visible" />
     <result column="wt" jdbcType="TINYINT" property="wt" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="count" property="count" jdbcType="INTEGER"/>
+    <result column="concern" jdbcType="INTEGER" property="concern"/>
+    <result column="cover" property="cover" jdbcType="VARCHAR"/>
+    <result column="description" property="description" jdbcType="VARCHAR"/>
+    <association property="concernInfo" javaType="Concern">
+      <result column="concern_concern" jdbcType="TINYINT" property="concern"/>
+    </association>
   </resultMap>
+  <!--批量插入-->
+  <insert id="batchInsert">
+    <foreach separator=";" item="topic" collection="topics">
+      insert into topic
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="topic.sid != null">
+          sid,
+        </if> <if test="topic.uid != null">
+          uid,
+        </if>
+        <if test='topic.name != null and !"".equals(topic.name)'>
+          name,
+        </if>
+        <if test="topic.visible != null">
+          visible,
+        </if>
+        <if test="topic.wt != null">
+          wt,
+        </if>
+        <if test='topic.createTime != null and !"".equals(topic.createTime)'>
+          create_time,
+        </if>
+      </trim>
+      VALUES
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="topic.sid != null">
+          #{topic.sid},
+        </if> <if test="topic.uid != null">
+          #{topic.uid},
+        </if>
+        <if test='topic.name != null and !"".equals(topic.name)'>
+          #{topic.name},
+        </if>
+        <if test="topic.visible != null">
+          #{topic.visible},
+        </if>
+        <if test="topic.wt != null">
+          #{topic.wt},
+        </if>
+        <if test='topic.createTime != null and !"".equals(topic.createTime)'>
+          #{topic.createTime},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <!--批量更新-->
+  <update id="batchUpdate">
+    <foreach separator=";" item="topic" collection="topics">
+      update topic
+      <set>
+        <trim suffixOverrides=",">
+          <if test="topic.sid != null">
+            sid = #{topic.sid},
+          </if> <if test="topic.uid != null">
+            uid = #{topic.uid},
+          </if>
+          <if test='topic.name != null and !"".equals(topic.name)'>
+            name = #{topic.name},
+          </if>
+          <if test="topic.visible != null">
+            visible = #{topic.visible},
+          </if>
+          <if test="topic.wt != null">
+            wt = #{topic.wt},
+          </if>
+          <if test='topic.createTime != null and !"".equals(topic.createTime)'>
+            create_time = #{topic.createTime},
+          </if>
+        </trim>
+      </set>
+      <where>
+        id = #{topic.id}
+      </where>
+    </foreach>
+  </update>
+
+  <!--前台查询话题带当前用户的关注信息-->
+  <select id="fSelectOne" resultMap="topic">
+    SELECT
+      a.*
+      <if test="uid !=null and uid != -1">
+        ,b.concern as concern_concern
+      </if>
+    FROM topic a
+    <if test="uid !=null and uid != -1">
+      LEFT JOIN
+        concern b
+      ON
+        b.oid = a.id
+      AND
+        b.uid = #{uid}
+    </if>
+    WHERE a.id = #{id}
+  </select>
+
+  <!--内容数目加1-->
+  <update id="updateCountAddOneById">
+    UPDATE topic set count = count + 1 WHERE id = #{id}
+  </update>
+
+  <!--关注或取消关注-->
+  <update id="updateConcernAddValueById">
+    UPDATE topic set concern = concern + #{value} WHERE id = #{id}
+  </update>
+
 </mapper>

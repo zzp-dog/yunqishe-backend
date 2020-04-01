@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.TopicCommentMapper">
+    <resultMap id="topicComment" type="com.zx.yunqishe.entity.TopicComment">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="wid" jdbcType="INTEGER" property="wid"/>
+        <result column="tcid" jdbcType="INTEGER" property="tcid"/>
+        <result column="good" jdbcType="TINYINT" property="good"/>
+        <result column="visible" jdbcType="TINYINT" property="visible"/>
+        <result column="charge" jdbcType="TINYINT" property="charge"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="text" jdbcType="LONGVARCHAR" property="text"/>
+        <result column="device" jdbcType="TINYINT" property="device"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="comment_count" javaType="INTEGER" property="commentCount"/>
+    </resultMap>
+
+    <!-- 评论带用户和角色 -->
+    <resultMap id="topicCommentWithUserWithRoles" type="TopicComment">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="wid" jdbcType="INTEGER" property="wid"/>
+        <result column="tcid" jdbcType="INTEGER" property="tcid"/>
+        <result column="good" jdbcType="TINYINT" property="good"/>
+        <result column="visible" jdbcType="TINYINT" property="visible"/>
+        <result column="charge" jdbcType="TINYINT" property="charge"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="text" jdbcType="LONGVARCHAR" property="text"/>
+        <result column="device" jdbcType="TINYINT" property="device"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="thumbup" jdbcType="INTEGER" property="thumbup"/>
+        <result column="thumbdown" jdbcType="INTEGER" property="thumbdown"/>
+        <!--回复者-->
+        <association property="user" javaType="User">
+            <id column="user_id" property="id"/>
+            <result column="user_avator" property="avator"/>
+            <result column="user_nickname" property="nickname"/>
+            <result column="user_experience" property="experience"/>
+            <result column="user_designation" property="designation"/>
+            <collection property="roles" ofType="Role">
+                <result column="role_name" property="name"/>
+                <result column="role_description" property="description"/>
+            </collection>
+        </association>
+        <!--对谁回复-->
+        <association property="who" javaType="User">
+            <id column="who_id" property="id"/>
+            <result column="who_avator" property="avator"/>
+            <result column="who_nickname" property="nickname"/>
+            <result column="who_experience" property="experience"/>
+            <result column="who_designation" property="designation"/>
+            <collection property="roles" ofType="Role">
+                <result column="who_role_name" property="name"/>
+                <result column="who_role_description" property="description"/>
+            </collection>
+        </association>
+        <association property="thumbInfo" javaType="Thumb">
+            <result column="thumb_thumb" jdbcType="TINYINT" property="thumb"/>
+        </association>
+    </resultMap>
+
+    <!-- 查顶级回复和子回复且都带上回复者用户信息和角色信息 -->
+    <resultMap id="topicCommentWithCommentsWithUserWithRoles" type="topicComment">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="wid" jdbcType="INTEGER" property="wid"/>
+        <result column="tcid" jdbcType="INTEGER" property="tcid"/>
+        <result column="good" jdbcType="TINYINT" property="good"/>
+        <result column="visible" jdbcType="TINYINT" property="visible"/>
+        <result column="charge" jdbcType="TINYINT" property="charge"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="text" jdbcType="LONGVARCHAR" property="text"/>
+        <result column="device" jdbcType="TINYINT" property="device"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="comment_count" javaType="INTEGER" property="commentCount"/>
+        <result column="thumbup" jdbcType="INTEGER" property="thumbup"/>
+        <result column="thumbdown" jdbcType="INTEGER" property="thumbdown"/>
+        <result column="pageNum2" jdbcType="INTEGER"/>
+        <result column="pageSize2" javaType="INTEGER"/>
+        <association property="user" javaType="User">
+            <id column="user_id" property="id"/>
+            <result column="user_avator" property="avator"/>
+            <result column="user_nickname" property="nickname"/>
+            <result column="user_experience" property="experience"/>
+            <result column="user_designation" property="designation"/>
+            <collection property="roles" ofType="Role" javaType="java.util.List">
+                <result column="role_name" property="name"/>
+                <result column="role_description" property="description"/>
+            </collection>
+        </association>
+        <association property="thumbInfo" javaType="Thumb">
+            <result column="thumb_thumb" jdbcType="TINYINT" property="thumb"/>
+        </association>
+        <!--
+            不要感觉pid的设计多余了，因为2级及以上回复的pid都是1级回复的id
+            ，这样才能将2级及以上的回复全部作为1级回复的子回复查出来！！！
+        -->
+        <collection property="comments" column="{pid=id,pageNum2=pageNum2,pageSize2=pageSize2}"
+                    select="fSelectLevel2List"/>
+    </resultMap>
+
+    <!--查询话题内容回复或评论列表，后续改为连查！！！-->
+    <select id="selectTopicCommentList" resultMap="topicComment">
+        SELECT a.* FROM topic_comment a
+        <where>
+            <trim suffixOverrides="AND">
+                <!-- 是否可见 -->
+                <if test="searchVisible != null and searchVisible != -1">
+                    AND a.visible = #{searchVisible}
+                </if>
+                <!-- 是否收费-->
+                <if test="searchCharge != null and searchCharge != -1">
+                    AND a.charge = #{searchCharge}
+                </if>
+                <!-- 标题模糊查询 -->
+                <if test='searchText != null and !"".equals(searchText)'>
+                    AND a.text like #{searchText}
+                </if>
+                AND a.tcid = #{tcid}
+            </trim>
+        </where>
+    </select>
+
+    <!--根据id批量更新话题内容回复或评论-->
+    <update id="batchUpdateTopicComment">
+        <foreach collection="comments" item="comment" separator=";">
+            update topic_comment
+            <set>
+                <trim suffixOverrides=",">
+                    <if test="comment.visible != null">
+                        visible = #{comment.visible},
+                    </if>
+                    <if test="comment.charge != null">
+                        charge = #{comment.charge},
+                    </if>
+                    <if test='comment.text != null and !"".equals(comment.text)'>
+                        text = #{comment.text}
+                    </if>
+                </trim>
+            </set>
+            <where>
+                id = #{comment.id}
+            </where>
+        </foreach>
+    </update>
+
+    <!--前台查询二级回复-->
+    <select id="fSelectLevel2List" resultMap="topicCommentWithUserWithRoles">
+        SELECT
+            a.*,
+            b.id as user_id,
+            b.avator as user_avator,
+            b.nickname as user_nickname,
+            b.experience as user_experience,
+            b.designation as user_designation,
+            e.id as who_id,
+            e.avator as who_avator,
+            e.nickname as who_nickname,
+            e.experience as who_experience
+          <if test="uid != null and uid != -1">
+              ,f.thumb as thumb_thumb
+          </if>
+        FROM
+            topic_comment a
+        INNER JOIN
+            user b
+        ON
+            a.uid = b.id
+        INNER JOIN
+            user e
+        ON
+            a.wid = e.id
+        <if test="uid != null and uid != -1">
+            LEFT JOIN
+              thumb f
+            ON
+              f.uid = #{uid}
+            AND
+              f.oid = a.id
+        </if>
+        WHERE
+            a.pid = #{pid}
+        ORDER BY
+            a.create_time
+        ASC
+        <if test="pageSize2 != null and pageNum2 != null">
+            LIMIT
+            ${pageSize2*(pageNum2-1)},#{pageSize2}
+        </if>
+    </select>
+
+    <!--前台查询顶级回复带二级回复,使用上述查询作为相关子查询，使用自身的话会出现递归查询-->
+    <select id="fSelectLevel1List" resultMap="topicCommentWithCommentsWithUserWithRoles">
+        SELECT
+            a.*,
+            b.id as user_id,
+            b.avator as user_avator,
+            b.nickname as user_nickname,
+            b.experience as user_experience,
+            b.designation as user_designation,
+            ${pageNum2} as pageNum2,
+            ${pageSize2} as pageSize2
+            <if test="uid != null and uid != -1">
+              ,c.thumb as thumb_thumb
+            </if>
+        FROM
+            topic_comment a
+        INNER JOIN
+            user b
+        ON
+            a.uid = b.id
+        <if test="uid != null and uid != -1">
+            LEFT JOIN
+              thumb c
+            ON
+              c.uid = #{uid}
+            AND
+              a.id = c.oid
+        </if>
+        WHERE
+            a.pid = -1
+        AND
+            a.tcid = #{tcid}
+        ORDER BY
+            a.create_time
+        DESC
+    </select>
+
+    <!--回复内容+1-->
+    <update id="updateCommentCountAddOneById">
+        UPDATE topic_comment set comment_count = comment_count + 1 WHERE id = #{id}
+    </update>
+
+    <!--通过加值，更新点赞数-->
+    <update id="updateThumbupAddValueById">
+        UPDATE topic_comment set thumbup = thumbup + #{value} WHERE id = #{id}
+    </update>
+
+    <!--通过加值，更新反对数-->
+    <update id="updateThumbdownAddValueById">
+        UPDATE topic_comment set thumbdown = thumbdown + #{value} WHERE id = #{id}
+    </update>
+
+</mapper>

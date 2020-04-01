@@ -34,7 +34,6 @@ public class Role {
      * 父角色id
      */
     @NotNull
-    @NotEmpty
     @Column(name = "pid")
     private Integer pid;
 

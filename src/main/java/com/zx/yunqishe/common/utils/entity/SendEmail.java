@@ -1,4 +1,4 @@
-package com.zx.yunqishe.common.utils.email;
+package com.zx.yunqishe.common.utils.entity;
 
 import lombok.Data;
 

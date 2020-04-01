@@ -8,6 +8,7 @@ import com.zx.yunqishe.entity.ResponseData;
 import com.zx.yunqishe.entity.extral.res.SimplePower;
 import com.zx.yunqishe.service.power.PowerService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * 只允许超级管理进行操作
+ */
 @RestController
 @RequestMapping(API.POWER)
 @Validated
@@ -65,6 +69,7 @@ public class PowerController {
      */
     @Decrypt
     @PostMapping(API.INSERT)
+    @RequiresRoles("superAdmin")
     @RequiresPermissions("rbac:power:insert")
     public ResponseData powerInsert(@Valid @RequestBody Power power) {
         return powerService.powerInsert(power);
@@ -77,6 +82,7 @@ public class PowerController {
      */
     @Decrypt
     @PostMapping(API.UPDATE)
+    @RequiresRoles("superAdmin")
     @RequiresPermissions("rbac:power:update")
     public ResponseData powerUpdate(@Valid @RequestBody Power power) {
         return powerService.powerUpdate(power);
@@ -89,6 +95,7 @@ public class PowerController {
      */
     @Decrypt
     @PostMapping(API.DELETE)
+    @RequiresRoles("superAdmin")
     @RequiresPermissions("rbac:power:delete")
     public ResponseData powerDelete(@RequestBody List<Integer> ids) {
         return powerService.powerDelete(ids);

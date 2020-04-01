@@ -1,8 +1,16 @@
 package com.zx.yunqishe.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
 public class Topic {
     /**
      * 自增节id
@@ -14,6 +22,7 @@ public class Topic {
     /**
      * 排序id
      */
+    @NotNull
     private Byte sid;
 
     /**
@@ -24,17 +33,21 @@ public class Topic {
     /**
      * 名称
      */
+    @NotNull
+    @NotBlank
     @Column(name = "NAME")
     private String name;
 
     /**
      * 1-可见，0-不可见
      */
+    @NotNull
     private Byte visible;
 
     /**
      * 0-非问题，1-问题
      */
+    @NotNull
     private Byte wt;
 
     /**
@@ -44,128 +57,28 @@ public class Topic {
     private Date createTime;
 
     /**
-     * 获取自增节id
-     *
-     * @return id - 自增节id
+     * 内容数目
      */
-    public Integer getId() {
-        return id;
-    }
+    private Integer count;
 
     /**
-     * 设置自增节id
-     *
-     * @param id 自增节id
+     * 关注数
      */
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    private Integer concern;
 
     /**
-     * 获取排序id
-     *
-     * @return sid - 排序id
+     * 描述
      */
-    public Byte getSid() {
-        return sid;
-    }
+    private String description;
 
     /**
-     * 设置排序id
-     *
-     * @param sid 排序id
+     * 封面
      */
-    public void setSid(Byte sid) {
-        this.sid = sid;
-    }
+    private String cover;
 
     /**
-     * 获取创建者id，-1-系统
-     *
-     * @return uid - 创建者id，-1-系统
+     * 当前用户关注信息
      */
-    public Integer getUid() {
-        return uid;
-    }
-
-    /**
-     * 设置创建者id，-1-系统
-     *
-     * @param uid 创建者id，-1-系统
-     */
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
-    /**
-     * 获取名称
-     *
-     * @return NAME - 名称
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * 设置名称
-     *
-     * @param name 名称
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * 获取1-可见，0-不可见
-     *
-     * @return visible - 1-可见，0-不可见
-     */
-    public Byte getVisible() {
-        return visible;
-    }
-
-    /**
-     * 设置1-可见，0-不可见
-     *
-     * @param visible 1-可见，0-不可见
-     */
-    public void setVisible(Byte visible) {
-        this.visible = visible;
-    }
-
-    /**
-     * 获取0-非问题，1-问题
-     *
-     * @return wt - 0-非问题，1-问题
-     */
-    public Byte getWt() {
-        return wt;
-    }
-
-    /**
-     * 设置0-非问题，1-问题
-     *
-     * @param wt 0-非问题，1-问题
-     */
-    public void setWt(Byte wt) {
-        this.wt = wt;
-    }
-
-    /**
-     * 获取创建时间
-     *
-     * @return create_time - 创建时间
-     */
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * 设置创建时间
-     *
-     * @param createTime 创建时间
-     */
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+    @Transient
+    private Concern concernInfo;
 }

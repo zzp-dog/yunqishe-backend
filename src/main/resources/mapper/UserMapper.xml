@@ -11,7 +11,34 @@
             </collection>
         </collection>
     </resultMap>
-    <!--查用户带角色,分页的时候要使用子查询，否则分页结果不正确-->
+    <!--查用户-->
+    <resultMap id="user" type="User">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avator" property="avator"/>
+        <result column="account" property="account"/>
+        <result column="age" property="age"/>
+        <result column="sex" property="sex"/>
+        <result column="qq" property="qq"/>
+        <result column="wechat" property="wechat"/>
+        <result column="email" property="email"/>
+        <result column="coin" property="coin"/>
+        <result column="status" property="status"/>
+        <result column="designation" property="designation"/>
+        <result column="experience" property="experience"/>
+        <result column="address" property="address"/>
+        <result column="say" property="say"/>
+        <result column="phone" property="phone"/>
+        <result column="concern" property="concern"/>
+        <result column="last_login_ip" property="lastLoginIp"/>
+        <result column="last_logout_ip" property="lastLogoutIp"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="last_logout_time" property="lastLogoutTime"/>
+        <result column="last_login_device" property="lastLoginDevice"/>
+        <result column="last_logout_device" property="lastLogoutDevice"/>
+    </resultMap>
+    <!--用户角色,一对多查询结果-->
     <resultMap id="userWithRoles" type="User">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
@@ -23,59 +50,20 @@
         <result column="qq" property="qq"/>
         <result column="wechat" property="wechat"/>
         <result column="email" property="email"/>
-        <result column="coin" property="con"/>
+        <result column="coin" property="coin"/>
         <result column="status" property="status"/>
         <result column="designation" property="designation"/>
         <result column="experience" property="experience"/>
         <result column="address" property="address"/>
         <result column="say" property="say"/>
         <result column="phone" property="phone"/>
+        <result column="concern" property="concern"/>
         <result column="last_login_ip" property="lastLoginIp"/>
         <result column="last_logout_ip" property="lastLogoutIp"/>
         <result column="last_login_time" property="lastLoginTime"/>
         <result column="last_logout_time" property="lastLogoutTime"/>
         <result column="last_login_device" property="lastLoginDevice"/>
         <result column="last_logout_device" property="lastLogoutDevice"/>
-        <result column="role_id"/>
-        <!--将id传入userId作为子查询语句的条件-->
-        <collection property="roles" ofType="Role" column="{userId=id,roleId=role_id}" select="selectUserRoles">
-        </collection>
-    </resultMap>
-    <!--用户角色和角色内连接查询结果,作为上面的子查询-->
-    <resultMap id="userRoleWithRole" type="Role">
-        <id column="id" property="id"/>
-        <result column="description" property="description"/>
-        <result column="create_time" property="createTime"/>
-        <result column="pid" property="pid"/>
-    </resultMap>
-
-    <!--用户角色,一对多查询结果-->
-    <resultMap id="userWithRoles2" type="User">
-        <id column="id" property="id"/>
-        <result column="name" property="name"/>
-        <result column="nickname" property="nickname"/>
-        <result column="avator" property="avator"/>
-        <result column="account" property="account"/>
-        <result column="age" property="age"/>
-        <result column="sex" property="sex"/>
-        <result column="qq" property="qq"/>
-        <result column="wechat" property="wechat"/>
-        <result column="email" property="email"/>
-        <result column="coin" property="con"/>
-        <result column="status" property="status"/>
-        <result column="designation" property="designation"/>
-        <result column="experience" property="experience"/>
-        <result column="address" property="address"/>
-        <result column="say" property="say"/>
-        <result column="phone" property="phone"/>
-        <result column="last_login_ip" property="lastLoginIp"/>
-        <result column="last_logout_ip" property="lastLogoutIp"/>
-        <result column="last_login_time" property="lastLoginTime"/>
-        <result column="last_logout_time" property="lastLogoutTime"/>
-        <result column="last_login_device" property="lastLoginDevice"/>
-        <result column="last_logout_device" property="lastLogoutDevice"/>
-        <result column="role_id"/>
-        <!--将id传入userId作为子查询语句的条件-->
         <collection property="roles" ofType="Role">
             <id column="rid" property="id"/>
             <result column="description" property="description"/>
@@ -84,8 +72,8 @@
         </collection>
     </resultMap>
 
-    <!--这个地方属性名不能重复，否则会出现绑定混乱的情况。。。-->
-    <select id="getUserRolePower" resultMap="userWithRolesWithPowers">
+    <!--查询用户角色权限，5表联查，这个地方属性名不能重复，否则会出现绑定混乱的情况。。。-->
+    <select id="selectUserWithRolesWithPowers" resultMap="userWithRolesWithPowers">
         SELECT
             a.id,
             c.NAME as rname,
@@ -99,27 +87,10 @@
         WHERE
             a.account = #{account};
      </select>
-    <!--根据用户id，角色id查角色-->
-    <select id="selectUserRoles" resultMap="userRoleWithRole">
-        SELECT a.id, a.description,a.create_time,a.pid
-        FROM role a
-        INNER  JOIN user_role b on a.id = b.role_id
-        <where>
-            <trim prefixOverrides="AND">
-                <if test="userId != null">
-                    AND b.user_id = #{userId}
-                </if>
-                <if test='roleId != null and !roleId.equals("null")'>
-                    AND a.id = #{roleId}
-                </if>
-            </trim>
-        </where>
-    </select>
-    <!--条件查询用户带角色，关联了子查询查用户角色-->
-    <select id="userSelectList" resultMap="userWithRoles">
+    <!--暂未使用。。。条件查询用户不带角色,不包括在回收站的用户-->
+    <select id="userSelectListNoRoles" resultMap="user">
         SELECT
         a.id,a.avator, a.name,a.nickname,a.sex,a.status
-        ,#{roleId} as role_id
         from user a
         <where>
             <trim prefixOverrides="AND">
@@ -142,6 +113,69 @@
             </trim>
         </where>
     </select>
+    <!--条件查询用户带角色列表,对应rbac的人员管理的条件查询-，不包括回收站的用户-->
+    <select id="selectUsersWithRolesByConditions" resultMap="userWithRoles">
+        select a.*
+        <if test="roleId != null">
+            ,c.id as rid,c.description,c.create_time,c.name,c.pid
+        </if>
+        FROM user a
+        <if test="roleId != null">
+            INNER JOIN user_role b ON a.id = b.user_id
+            INNER JOIN role c ON c.id = b.role_id
+        </if>
+        <where>
+            <trim prefixOverrides="AND">
+                <if test='name != null and name !=""'>
+                    AND a.name like #{name}
+                </if>
+                <if test='nickname != null and nickname !=""'>
+                    AND a.nickname like #{nickname}
+                </if>
+                <if test='sex != null'>
+                    AND a.sex = #{sex}
+                </if>
+                <if test='status != null'>
+                    AND a.status = #{status}
+                </if>
+                <!-- 如果没有status则设置不显示已回收的用户 status=5 表示在回收站 -->
+                <if test="status == null">
+                    AND a.status != 5
+                </if>
+                <!-- 有角色id -->
+                <if test="roleId != null">
+                    AND c.id = #{roleId}
+                </if>
+            </trim>
+        </where>
+    </select>
+    <!--根据用户id查询单条用户角色-->
+    <select id="selectUserWithRolesByUserId" resultMap="userWithRoles">
+        SELECT
+        a.*,
+        c.id AS rid,
+        c.description,
+        c.create_time,
+        c.pid
+        FROM
+        USER a
+        LEFT JOIN user_role b ON a.id = b.user_id
+        LEFT JOIN role c ON b.role_id = c.id
+        WHERE
+        a.id = #{id};
+    </select>
+    <!--根据批量用户id查询用户角色-->
+    <select id="selectUserRolesUserIdIn" resultMap="userWithRoles">
+        SELECT a.id,c.id rid,c.pid FROM user a INNER JOIN user_role b
+        ON a.id = b.user_id INNER JOIN role c ON c.id = b.role_id
+        <where>
+            a.id IN
+            <foreach collection="ids" item="id" separator="," close=")" open="(">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
     <!--批量更新用户-->
     <update id="batchUpdate" parameterType="java.util.List">
         <foreach collection="users" item="user" index="index" open="" close="" separator=";">
@@ -217,30 +251,10 @@
             WHERE id = #{user.id}
         </foreach>
     </update>
-    <!--查询单条用户信息-->
-    <select id="selectOneByPrimary" resultMap="userWithRoles">
-        SELECT
-            a.*,
-            c.id AS rid,
-            c.description,
-            c.create_time,
-            c.pid
-        FROM
-            USER a
-            LEFT JOIN user_role b ON a.id = b.user_id
-            LEFT JOIN role c ON b.role_id = c.id
-        WHERE
-            a.id = #{id};
-    </select>
 
-    <!--批量查询用户角色-->
-    <select id="selectUserRolesIn">
-        SELECT a.id,c.id rid,c.pid FROM user a INNER  JOIN user_role b
-        ON a.id = b.user_id INNER  JOIN role c ON c.id = b.role_id
-        <where>
-            <foreach collection="ids" item="id" separator="," close=")" open="(">
-                #{id}
-            </foreach>
-        </where>
-    </select>
+    <!--关注或取消关注-->
+    <update id="updateConcernAddValueById">
+        UPDATE topic set concern = concern + #{value} WHERE id = #{id}
+    </update>
+
 </mapper>

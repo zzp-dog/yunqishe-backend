@@ -10,7 +10,7 @@
     <result column="NAME" jdbcType="VARCHAR" property="name" />
     <result column="section" jdbcType="INTEGER" property="section" />
     <result column="introduce" jdbcType="VARCHAR" property="introduce" />
-    <result column="view_count" jdbcType="INTEGER" property="viewCount" />
+    <result column="view" jdbcType="INTEGER" property="view" />
     <result column="visible" jdbcType="TINYINT" property="visible" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />

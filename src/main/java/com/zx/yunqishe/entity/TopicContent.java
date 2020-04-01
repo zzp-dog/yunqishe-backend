@@ -1,9 +1,15 @@
 package com.zx.yunqishe.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "topic_content")
+@Setter
+@Getter
 public class TopicContent {
     /**
      * 自增节id
@@ -18,20 +24,14 @@ public class TopicContent {
     private Integer uid;
 
     /**
-     * 所属话题的id[冗余，子内容不需要]
+     * 所属话题的id
      */
     private Integer tid;
 
     /**
-     * 所属话题父内容的id，-1表示顶级
+     * 标题
      */
-    private Integer pid;
-
-    /**
-     * 名称
-     */
-    @Column(name = "NAME")
-    private String name;
+    private String title;
 
     /**
      * 摘要
@@ -41,23 +41,18 @@ public class TopicContent {
     /**
      * 浏览次数
      */
-    @Column(name = "view_count")
-    private Integer viewCount;
+    @Column(name = "view")
+    private Integer view;
 
     /**
-     * 1-精华（pid=-1）/神评, 0-否
+     * 1-精华, 0-否
      */
     private Byte good;
 
     /**
-     * 1-置顶，0-不置顶
+     * 1-置顶，0-不置顶【可以有多个置顶哦】
      */
     private Byte top;
-
-    /**
-     * 1-被采纳(针对话题为问题)，0-不采纳（冗余）
-     */
-    private Byte adopt;
 
     /**
      * 1-可改，0-不可改
@@ -71,20 +66,35 @@ public class TopicContent {
     private Byte visible;
 
     /**
-     * 1-收费，0-不收费（只限话题内容，评论冗余该字段）
+     * 1-收费，0-不收费
      */
     private Byte charge;
+
+    /**
+     * 封面地址url
+     */
+    private String cover;
 
     /**
      * 创建时间
      */
     @Column(name = "create_time")
+    @JsonFormat(
+            locale = "zh",
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
     private Date createTime;
 
     /**
      * 更新时间
      */
     @Column(name = "update_time")
+    @JsonFormat(
+            locale = "zh",
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
     private Date updateTime;
 
     /**
@@ -93,290 +103,67 @@ public class TopicContent {
     private String text;
 
     /**
-     * 获取自增节id
-     *
-     * @return id - 自增节id
+     * 发表时设备
      */
-    public Integer getId() {
-        return id;
-    }
+    private Byte device;
 
     /**
-     * 设置自增节id
-     *
-     * @param id 自增节id
+     * 发表时定位，可根据ip粗略定位
      */
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    private String address;
 
     /**
-     * 获取作者id
-     *
-     * @return uid - 作者id
+     * 收藏数
      */
-    public Integer getUid() {
-        return uid;
-    }
+    private Integer concern;
 
     /**
-     * 设置作者id
-     *
-     * @param uid 作者id
+     * 点赞数
      */
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
+    private Integer thumbup;
 
     /**
-     * 获取所属话题的id[冗余，子内容不需要]
-     *
-     * @return tid - 所属话题的id[冗余，子内容不需要]
+     * 反对数
      */
-    public Integer getTid() {
-        return tid;
-    }
+    private Integer thumbdown;
 
     /**
-     * 设置所属话题的id[冗余，子内容不需要]
-     *
-     * @param tid 所属话题的id[冗余，子内容不需要]
+     * 转发数
      */
-    public void setTid(Integer tid) {
-        this.tid = tid;
-    }
+    private Integer forward;
 
     /**
-     * 获取所属话题父内容的id，-1表示顶级
-     *
-     * @return pid - 所属话题父内容的id，-1表示顶级
+     * 所属模块0-论坛，1-问云
      */
-    public Integer getPid() {
-        return pid;
-    }
+
+    private Byte wt;
+    /**
+     * 作者姓名
+     */
+    @Transient
+    private User user;
 
     /**
-     * 设置所属话题父内容的id，-1表示顶级
-     *
-     * @param pid 所属话题父内容的id，-1表示顶级
+     * 分类名称
      */
-    public void setPid(Integer pid) {
-        this.pid = pid;
-    }
+    @Transient
+    private Topic topic;
 
     /**
-     * 获取名称
-     *
-     * @return NAME - 名称
+     * 评论数
      */
-    public String getName() {
-        return name;
-    }
+    @Column(name = "comment_count")
+    private Integer commentCount;
 
     /**
-     * 设置名称
-     *
-     * @param name 名称
+     * 是否被当前用户关注
      */
-    public void setName(String name) {
-        this.name = name;
-    }
+    @Transient
+    private Concern concernInfo;
 
     /**
-     * 获取摘要
-     *
-     * @return introduce - 摘要
+     * 是否点赞或反对或都不是
      */
-    public String getIntroduce() {
-        return introduce;
-    }
-
-    /**
-     * 设置摘要
-     *
-     * @param introduce 摘要
-     */
-    public void setIntroduce(String introduce) {
-        this.introduce = introduce;
-    }
-
-    /**
-     * 获取浏览次数
-     *
-     * @return view_count - 浏览次数
-     */
-    public Integer getViewCount() {
-        return viewCount;
-    }
-
-    /**
-     * 设置浏览次数
-     *
-     * @param viewCount 浏览次数
-     */
-    public void setViewCount(Integer viewCount) {
-        this.viewCount = viewCount;
-    }
-
-    /**
-     * 获取1-精华（pid=-1）/神评, 0-否
-     *
-     * @return good - 1-精华（pid=-1）/神评, 0-否
-     */
-    public Byte getGood() {
-        return good;
-    }
-
-    /**
-     * 设置1-精华（pid=-1）/神评, 0-否
-     *
-     * @param good 1-精华（pid=-1）/神评, 0-否
-     */
-    public void setGood(Byte good) {
-        this.good = good;
-    }
-
-    /**
-     * 获取1-置顶，0-不置顶
-     *
-     * @return top - 1-置顶，0-不置顶
-     */
-    public Byte getTop() {
-        return top;
-    }
-
-    /**
-     * 设置1-置顶，0-不置顶
-     *
-     * @param top 1-置顶，0-不置顶
-     */
-    public void setTop(Byte top) {
-        this.top = top;
-    }
-
-    /**
-     * 获取1-被采纳(针对话题为问题)，0-不采纳（冗余）
-     *
-     * @return adopt - 1-被采纳(针对话题为问题)，0-不采纳（冗余）
-     */
-    public Byte getAdopt() {
-        return adopt;
-    }
-
-    /**
-     * 设置1-被采纳(针对话题为问题)，0-不采纳（冗余）
-     *
-     * @param adopt 1-被采纳(针对话题为问题)，0-不采纳（冗余）
-     */
-    public void setAdopt(Byte adopt) {
-        this.adopt = adopt;
-    }
-
-    /**
-     * 获取1-可改，0-不可改
-     *
-     * @return MODIFY - 1-可改，0-不可改
-     */
-    public Byte getModify() {
-        return modify;
-    }
-
-    /**
-     * 设置1-可改，0-不可改
-     *
-     * @param modify 1-可改，0-不可改
-     */
-    public void setModify(Byte modify) {
-        this.modify = modify;
-    }
-
-    /**
-     * 获取1-可见，0-不可见
-     *
-     * @return visible - 1-可见，0-不可见
-     */
-    public Byte getVisible() {
-        return visible;
-    }
-
-    /**
-     * 设置1-可见，0-不可见
-     *
-     * @param visible 1-可见，0-不可见
-     */
-    public void setVisible(Byte visible) {
-        this.visible = visible;
-    }
-
-    /**
-     * 获取1-收费，0-不收费（只限话题内容，评论冗余该字段）
-     *
-     * @return charge - 1-收费，0-不收费（只限话题内容，评论冗余该字段）
-     */
-    public Byte getCharge() {
-        return charge;
-    }
-
-    /**
-     * 设置1-收费，0-不收费（只限话题内容，评论冗余该字段）
-     *
-     * @param charge 1-收费，0-不收费（只限话题内容，评论冗余该字段）
-     */
-    public void setCharge(Byte charge) {
-        this.charge = charge;
-    }
-
-    /**
-     * 获取创建时间
-     *
-     * @return create_time - 创建时间
-     */
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * 设置创建时间
-     *
-     * @param createTime 创建时间
-     */
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    /**
-     * 获取更新时间
-     *
-     * @return update_time - 更新时间
-     */
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * 设置更新时间
-     *
-     * @param updateTime 更新时间
-     */
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    /**
-     * 获取内容
-     *
-     * @return text - 内容
-     */
-    public String getText() {
-        return text;
-    }
-
-    /**
-     * 设置内容
-     *
-     * @param text 内容
-     */
-    public void setText(String text) {
-        this.text = text;
-    }
+    @Transient
+    private Thumb thumbInfo;
 }

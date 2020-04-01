@@ -39,16 +39,18 @@ public class ErrorMsg {
     public static final String ADMIN_EXISTS_ERROR = "系统管理员已存在";
     public static final String ERROR_PERMISSION = "权限不足!";
     public static final String CANNOT_TRASH = "无法删除";
-    public static final String CANNOT_UPDATE = "不可更新";
+    public static final String ROLE_BOUND = "存在角色限制问题!";
 
     /** role */
+    public static final String POWER_BOUND = "存在权限限制问题!";
     public static final String ROLE_BEUSED = "角色被占用,操作失败";
     public static final String ROLE_BEUSEDBYCHILD = "存在角色被子角色占用,操作失败";
-    public static final String ROLE_PID_ERROR = "不能设置自身或下级角色为父角色";
-    public static final String ROLE_POWER_BOUND = "权限不能超过父角色";
 
     /** power */
+    public static final String PARENT_BOUND = "存在父级限制问题!";
     public static final String POWER_BEUSED = "权限被占用,操作失败";
     public static final String POWER_BEUSEDBYCHILD = "存在权限被子权限占用,操作失败";
-    public static final String POWER_PID_ERROR = "不能设置自身或下级权限为父权限";
+
+    /** http请求 */
+    public static final String REQUEST_REPEAT = "不能重复请求~";
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.ThumbMapper">
+  <resultMap id="BaseResultMap" type="Thumb">
+
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uid" jdbcType="INTEGER" property="uid" />
+    <result column="oid" jdbcType="INTEGER" property="oid" />
+    <result column="thumb" jdbcType="TINYINT" property="thumb"/>
+    <result column="type" jdbcType="TINYINT" property="type"/>
+  </resultMap>
+  <!--点赞或反对，无则插入，有则更新,需要唯一索引，这里是oid和uid-->
+  <insert id="fInsertOrUpdateOne">
+    INSERT INTO
+    thumb(uid,oid,thumb,type)
+    VALUES
+    (#{thumb.uid},#{thumb.oid},#{thumb.thumb},#{thumb.type})
+    ON DUPLICATE KEY UPDATE
+    uid = #{thumb.uid},
+    oid = #{thumb.oid},
+    thumb = #{thumb.thumb},
+    type = #{thumb.type}
+  </insert>
+</mapper>
