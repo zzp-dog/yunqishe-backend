@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zx.yunqishe.dao.UserMapper">
-    <!--五表联查绑定结果，注意不能省略集合的ofType-->
+    <!--RBAC五表联查绑定结果，注意不能省略集合的ofType-->
     <resultMap id="userWithRolesWithPowers" type="User">
         <id column="id" property="id"/>
         <collection property="roles" ofType="Role">
@@ -37,6 +37,8 @@
         <result column="last_logout_time" property="lastLogoutTime"/>
         <result column="last_login_device" property="lastLoginDevice"/>
         <result column="last_logout_device" property="lastLogoutDevice"/>
+        <result column="role_names" property="roleNames"/>
+        <result column="partner" property="partner"/>
     </resultMap>
     <!--用户角色,一对多查询结果-->
     <resultMap id="userWithRoles" type="User">
@@ -87,32 +89,7 @@
         WHERE
             a.account = #{account};
      </select>
-    <!--暂未使用。。。条件查询用户不带角色,不包括在回收站的用户-->
-    <select id="userSelectListNoRoles" resultMap="user">
-        SELECT
-        a.id,a.avator, a.name,a.nickname,a.sex,a.status
-        from user a
-        <where>
-            <trim prefixOverrides="AND">
-                <if test='name != null and name !=""'>
-                    AND a.name like #{name}
-                </if>
-                <if test='nickname != null and nickname !=""'>
-                    AND a.nickname like #{nickname}
-                </if>
-                <if test='sex != null'>
-                    AND a.sex = #{sex}
-                </if>
-                <if test='status != null'>
-                    AND a.status = #{status}
-                </if>
-                <!-- 如果没有status则设置不显示已回收的用户 status=5 表示在回收站 -->
-                <if test="status == null">
-                    AND a.status != 5
-                </if>
-            </trim>
-        </where>
-    </select>
+
     <!--条件查询用户带角色列表,对应rbac的人员管理的条件查询-，不包括回收站的用户-->
     <select id="selectUsersWithRolesByConditions" resultMap="userWithRoles">
         select a.*
@@ -174,6 +151,17 @@
                 #{id}
             </foreach>
         </where>
+    </select>
+
+    <!--查询活跃用户-->
+    <select id="fSelectActiveList" resultMap="user">
+      SELECT
+      a.id,a.nickname,a.avator,a.experience,a.partner,a.role_names
+      FROM
+      user a
+      ORDER BY
+      last_login_time
+      ASC
     </select>
 
     <!--批量更新用户-->

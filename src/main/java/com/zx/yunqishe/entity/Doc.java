@@ -1,172 +1,70 @@
 package com.zx.yunqishe.entity;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
+
+@Getter
+@Setter
 public class Doc {
     /**
      * 自增id
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    protected Integer id;
 
     /**
      * 父id,-1-总分类无父id
      */
-    private Byte pid;
+    protected Integer pid;
 
     /**
      * 排序id
      */
-    private Byte sid;
+    protected Integer sid;
 
     /**
      * 名称
      */
     @Column(name = "NAME")
-    private String name;
-
-    /**
-     * 类型0-总分类，1-文档，2-章
-     */
-    private Byte type;
+    protected String name;
 
     /**
      * 1-可见，0-不可见
      */
-    private Byte visible;
+    protected Byte visible;
 
     /**
      * 1-收费，0-不收费
      */
-    private Byte charge;
+    protected Byte charge;
 
     /**
-     * 获取自增id
-     *
-     * @return id - 自增id
+     * 文档分类创建时间
      */
-    public Integer getId() {
-        return id;
-    }
+    @Column(name = "create_time")
+    @JsonFormat(
+            locale = "zh",
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    protected Date createTime;
+
+    /** 封面 */
+    protected String cover;
 
     /**
-     * 设置自增id
-     *
-     * @param id 自增id
+     * 类型1-总分类，2-文档，3-章
      */
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    private Byte type;
 
-    /**
-     * 获取父id,-1-总分类无父id
-     *
-     * @return pid - 父id,-1-总分类无父id
-     */
-    public Byte getPid() {
-        return pid;
-    }
+    /** 子内容 */
+    @Transient
+    private List<Doc> docs;
 
-    /**
-     * 设置父id,-1-总分类无父id
-     *
-     * @param pid 父id,-1-总分类无父id
-     */
-    public void setPid(Byte pid) {
-        this.pid = pid;
-    }
-
-    /**
-     * 获取排序id
-     *
-     * @return sid - 排序id
-     */
-    public Byte getSid() {
-        return sid;
-    }
-
-    /**
-     * 设置排序id
-     *
-     * @param sid 排序id
-     */
-    public void setSid(Byte sid) {
-        this.sid = sid;
-    }
-
-    /**
-     * 获取名称
-     *
-     * @return NAME - 名称
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * 设置名称
-     *
-     * @param name 名称
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * 获取类型0-总分类，1-文档，2-章
-     *
-     * @return type - 类型0-总分类，1-文档，2-章
-     */
-    public Byte getType() {
-        return type;
-    }
-
-    /**
-     * 设置类型0-总分类，1-文档，2-章
-     *
-     * @param type 类型0-总分类，1-文档，2-章
-     */
-    public void setType(Byte type) {
-        this.type = type;
-    }
-
-    /**
-     * 获取1-可见，0-不可见
-     *
-     * @return visible - 1-可见，0-不可见
-     */
-    public Byte getVisible() {
-        return visible;
-    }
-
-    /**
-     * 设置1-可见，0-不可见
-     *
-     * @param visible 1-可见，0-不可见
-     */
-    public void setVisible(Byte visible) {
-        this.visible = visible;
-    }
-
-    /**
-     * 获取1-收费，0-不收费
-     *
-     * @return charge - 1-收费，0-不收费
-     */
-    public Byte getCharge() {
-        return charge;
-    }
-
-    /**
-     * 设置1-收费，0-不收费
-     *
-     * @param charge 1-收费，0-不收费
-     */
-    public void setCharge(Byte charge) {
-        this.charge = charge;
-    }
 }

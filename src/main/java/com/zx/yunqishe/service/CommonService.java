@@ -8,6 +8,7 @@ import com.zx.yunqishe.service.user.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * 通用服务
@@ -34,17 +35,15 @@ public class CommonService {
         String account = (String)subject.getPrincipals().getPrimaryPrincipal();
         if (account == null) return null;
 
-        User queryUser = new User();
-        queryUser.setAccount(account);
-        User normalUser = userMapper.selectOne(queryUser);
-
-        User baseUser = new User();
-        baseUser.setId(normalUser.getId());
-        baseUser.setName(normalUser.getName());
-        baseUser.setAvator(normalUser.getAvator());
-        baseUser.setNickname(normalUser.getNickname());
+        Example example = new Example(User.class);
+        Example.Criteria criteria = example.createCriteria();
+        example.selectProperties(new String[]{
+                "id", "name", "nickname",
+                "avator","experience", "roleNames"
+        });
+        criteria.andEqualTo("account", account);
+        User baseUser = userMapper.selectOneByExample(example);
         subject.getSession().setAttribute("me", baseUser);
-
         return baseUser;
     }
 
@@ -54,6 +53,6 @@ public class CommonService {
      */
     protected Integer getUserId() {
         User user = getCurrentBaseUser();
-        return user == null ? -1 : user.getId();
+        return user == null ? null : user.getId();
     }
 }

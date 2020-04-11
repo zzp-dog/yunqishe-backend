@@ -126,4 +126,23 @@ public class TopicContentService extends CommonService{
         topicContentMapper.updateViewAddValueById(id, 1);
         return ResponseData.success().add("topicContent", topicContent);
     }
+
+    /**
+     * 查询推荐内容
+     * @param wt
+     * @param pageSize
+     * @return
+     */
+    public ResponseData fSelectRecommendList(Integer wt, Integer pageSize) {
+        Example example = new Example(TopicContent.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("wt", wt);
+        example.selectProperties(new String[] {
+                "id", "tid", "title",
+                "cover", "introduce"
+        });
+        PageHelper.startPage(1, pageSize);
+        List<TopicContent> topicContents = topicContentMapper.selectByExample(example);
+        return ResponseData.success().add("topicContents", topicContents);
+    }
 }

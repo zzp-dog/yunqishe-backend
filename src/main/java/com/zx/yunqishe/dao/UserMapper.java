@@ -54,4 +54,10 @@ public interface UserMapper extends Mapper<User> {
      * @param value
      */
     void updateConcernAddValueById(@Param("id") Integer oid, @Param("value") Integer value);
+
+    /**
+     * 查询活跃用户
+     * @return
+     */
+    List<User> fSelectActiveList();
 }

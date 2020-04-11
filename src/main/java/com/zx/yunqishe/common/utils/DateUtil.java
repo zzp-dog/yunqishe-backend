@@ -21,6 +21,15 @@ public class DateUtil {
     }
 
     /**
+     * 获取时间字符串
+     * @return
+     */
+    public static String dataTime2str(LocalDateTime ldt) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(DATE_TIME);
+        return ldt.format(df);
+    }
+
+    /**
      * localDateTime转时间戳
      * @return
      */
@@ -87,7 +96,7 @@ public class DateUtil {
      * @param ldt
      * @return
      */
-    public static Date date2localDateTime(LocalDateTime ldt) {
+    public static Date localDateTime2Date(LocalDateTime ldt) {
         return Date.from(ldt.atZone( ZoneId.systemDefault()).toInstant());
     }
 }

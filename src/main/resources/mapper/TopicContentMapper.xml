@@ -20,6 +20,7 @@
     <result column="wt" jdbcType="TINYINT" property="wt"/>
     <result column="concern" jdbcType="INTEGER" property="concern"/>
     <result column="thumbup" jdbcType="INTEGER" property="thumbup"/>
+    <result column="forward" jdbcType="INTEGER" property="forward"/>
     <result column="comment_count" jdbcType="INTEGER" property="commentCount"/>
   </resultMap>
 
@@ -43,6 +44,7 @@
     <result column="wt" jdbcType="TINYINT" property="wt"/>
     <result column="concern" jdbcType="INTEGER" property="concern"/>
     <result column="thumbup" jdbcType="INTEGER" property="thumbup"/>
+    <result column="forward" jdbcType="INTEGER" property="forward"/>
     <result column="comment_count" jdbcType="INTEGER" property="commentCount"/>
     <!--关联用户-->
     <association property="user" javaType="User">
@@ -132,10 +134,11 @@
     </foreach>
   </update>
 
-  <!-- 前台获取论坛帖子列表 type：1-全站（不用判断），2-最近，3-精华，4-人气，5-随机 -->
+  <!-- 前台获取论坛帖子列表 type：非2，3，4，5-全站（不用判断），2-最近，3-精华，4-人气，5-随机 -->
   <select id="fSelectList" resultMap="topicContent">
     SELECT
       a.id,
+      a.tid,
       a.cover,
       a.title,
       a.charge,
@@ -147,14 +150,15 @@
       a.view,
       a.create_time,
       a.update_time,
-      a.comment_count
+      a.comment_count,
+      a.forward
     FROM
       topic_content a
     WHERE
       wt = #{wt}
     AND
       visible = 1
-    <if test="tid != null">
+    <if test="tid != null and tid != -1">
       AND
         tid = #{tid}
     </if>
@@ -177,7 +181,7 @@
     DESC
   </select>
 
-  <!--前台根据话题内容id查询话题内容-->
+  <!--前台根据话题内容id查询话题内容 带收藏信息-->
   <select id="fSelectOne" resultMap="topicContentWithUserWithRoles">
     SELECT
       a.*,
@@ -187,7 +191,7 @@
       b.designation as user_designation,
       d.name as role_name,
       d.description as role_description
-      <if test="uid != null">
+      <if test="uid != null and uid != -1">
         ,e.concern as concern_concern,
         f.thumb as thumb_thumb
       </if>
@@ -205,7 +209,7 @@
       role d
     ON
       d.id = c.role_id
-    <if test="uid !=null">
+    <if test="uid !=null and uid != -1">
       LEFT JOIN
         concern e
       ON

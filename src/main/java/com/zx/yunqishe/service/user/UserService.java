@@ -1,5 +1,6 @@
 package com.zx.yunqishe.service.user;
 
+import com.github.pagehelper.PageHelper;
 import com.zx.yunqishe.common.consts.ErrorMsg;
 import com.zx.yunqishe.common.utils.CookieUtil;
 import com.zx.yunqishe.common.utils.DateUtil;
@@ -26,6 +27,7 @@ import tk.mybatis.mapper.entity.Example;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -87,17 +89,27 @@ public class UserService extends CommonService{
      * @throws Exception
      */
     public ResponseData login(SingleUser suser) {
-        String pass = suser.getPassword();
         String account = suser.getAccount();
+        String password = suser.getPassword();
         Subject subject = SecurityUtils.getSubject();
-        UsernamePasswordToken token = new UsernamePasswordToken(account,pass);
+        UsernamePasswordToken token = new UsernamePasswordToken(account,password);
         // 执行认证登陆并记住我
         try {
             token.setRememberMe(true);
             subject.login(token);
+            // 更新登录时间
+            LocalDateTime ldt = LocalDateTime.now();
+            String now = DateUtil.dataTime2str(ldt);
+            User user = new User();
+            user.setLastLoginTime(now);
+            Example example = new Example(User.class);
+            Example.Criteria criteria = example.createCriteria();
+            criteria.andEqualTo("account", account);
+            criteria.andEqualTo("password", password);
+            userMapper.updateByExampleSelective(user, example);
             // 查用户简易信息并返回给前端
-            User user = getCurrentBaseUser();
-            return ResponseData.success().add("user", user);
+            User baseUser = getCurrentBaseUser();
+            return ResponseData.success().add("user", baseUser);
         } catch (Exception e) {
             return ResponseData.error(ErrorMsg.LOGIN_ERROR).add("cause", e);
         }
@@ -536,4 +548,14 @@ public class UserService extends CommonService{
         return ResponseData.success();
     }
 
+    /**
+     * 查询活跃用户
+     * @param pageSize
+     * @return
+     */
+    public ResponseData fSelectActiveList(Integer pageSize) {
+        PageHelper.startPage(1, pageSize);
+        List<User> activeUsers = userMapper.fSelectActiveList();
+        return ResponseData.success().add("users", activeUsers);
+    }
 }

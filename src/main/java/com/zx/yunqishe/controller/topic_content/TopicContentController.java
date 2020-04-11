@@ -1,4 +1,4 @@
-package com.zx.yunqishe.controller.content;
+package com.zx.yunqishe.controller.topic_content;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -124,8 +124,8 @@ public class TopicContentController {
     /**
      * 前台获取论坛帖子列表(置顶靠前)
      * @param wt 0-非问题（论坛）1-问题（问云）
-     * @param type 1-全部，2-最新，3-精华，4-人气，5随机
      * @param tid - 所属话题，可选
+     * @param type 1-全部，2-最新，3-精华，4-人气，5随机
      * @param pageNum 哪一页
      * @param pageSize list大小
      * @return
@@ -133,8 +133,8 @@ public class TopicContentController {
     @GetMapping(API.FRONTEND+API.SELECT+API.LIST)
     public ResponseData fSelectList(
             @RequestParam(value = "wt") Byte wt,
-            @RequestParam(value = "type") Integer type,
             @RequestParam(value = "tid", required = false) Integer tid,
+            @RequestParam(value = "type", defaultValue = "1") Integer type,
             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             ) {
@@ -152,4 +152,17 @@ public class TopicContentController {
         return topicContentService.fSelectOne(id);
     }
 
+    /**
+     * 查询推荐内容
+     * @param wt
+     * @param pageSize
+     * @return
+     */
+    @GetMapping(API.FRONTEND + API.SELECT + "/recommend" + API.LIST)
+    public ResponseData fSelectRecommendList(
+            @RequestParam(name = "wt") Integer wt,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
+        return topicContentService.fSelectRecommendList(wt, pageSize);
+    }
 }

@@ -1,5 +1,8 @@
 package com.zx.yunqishe.service.topic;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zx.yunqishe.dao.TopicMapper;
 import com.zx.yunqishe.entity.ResponseData;
 import com.zx.yunqishe.entity.Topic;
@@ -10,8 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.validation.constraints.NotEmpty;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -100,5 +106,32 @@ public class TopicService extends CommonService{
         Integer uid = getUserId();
         Topic topic = topicMapper.fSelectOne(id, uid);
         return ResponseData.success().add("topic", topic);
+    }
+
+    /**
+     * 前台问云获取已关注和未关注话题
+     * 因为前台UI显示问题，所以总共最多只能查7个话题
+     * @param max
+     * @return
+     */
+    public ResponseData fWenyunSelectList(Integer max) {
+        // 查已关注话题列表
+        Integer uid = getUserId();
+        PageHelper.startPage(1,max);
+        List<Topic> topics = topicMapper.selectConcernList(1, uid);
+
+        Map<String, Object> map = new HashMap<>();
+        List<Topic> concerns = new ArrayList<>();
+        List<Topic> recommends = new ArrayList<>();
+        map.put("concern", concerns);
+        map.put("recommend", recommends);
+        for (Topic topic : topics) {
+            if (null == topic.getConcernInfo() || topic.getConcernInfo().getConcern() == 0) {
+                recommends.add(topic);
+            } else {
+                concerns.add(topic);
+            }
+        }
+        return ResponseData.success().add("topics", map);
     }
 }

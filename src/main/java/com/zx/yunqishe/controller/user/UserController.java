@@ -228,4 +228,13 @@ public class UserController {
         return userService.updateAdminBaseInfo(admin, req);
     }
 
+    /**
+     * 查询活跃用户
+     * @param pageSize
+     * @return
+     */
+    @GetMapping(API.FRONTEND + API.SELECT  + "/active"  + API.LIST)
+    public ResponseData fSelectActiveList(@RequestParam(name = "pageSize", defaultValue = "15") Integer pageSize) {
+        return userService.fSelectActiveList(pageSize);
+    }
 }

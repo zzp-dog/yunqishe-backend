@@ -1,5 +1,6 @@
 package com.zx.yunqishe.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -54,6 +55,11 @@ public class Topic {
      * 创建时间
      */
     @Column(name = "create_time")
+    @JsonFormat(
+            locale = "zh",
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
     private Date createTime;
 
     /**

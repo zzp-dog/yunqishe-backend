@@ -38,4 +38,12 @@ public interface TopicMapper extends Mapper<Topic> {
      * @return
      */
     Topic fSelectOne(@Param("id") Integer id, @Param("uid") Integer uid);
+
+    /**
+     * 查询用户关注话题列表
+     * @param wt 所属模块 0-论坛，1-问云
+     * @param uid
+     * @return
+     */
+    List<Topic> selectConcernList(@Param("wt") int wt, @Param("uid") Integer uid);
 }

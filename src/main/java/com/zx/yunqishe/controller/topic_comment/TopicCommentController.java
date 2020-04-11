@@ -1,4 +1,4 @@
-package com.zx.yunqishe.controller.comment;
+package com.zx.yunqishe.controller.topic_comment;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;

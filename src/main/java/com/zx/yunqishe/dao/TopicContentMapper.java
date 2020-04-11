@@ -24,7 +24,7 @@ public interface TopicContentMapper extends Mapper<TopicContent> , UpdateThumbCo
     /**
      * 获取论坛首部右侧tab中帖子列表
      * @param wt 0-非问题（论坛）1-问题（问云）
-     * @param type 1-近期，2-热门，3-随机
+     * @param type 2-最近，3-精华，4-人气，5-随机
      * @param tid - 所属话题id
      * @return
      */

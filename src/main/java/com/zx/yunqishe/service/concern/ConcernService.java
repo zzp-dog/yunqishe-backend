@@ -11,8 +11,10 @@ import com.zx.yunqishe.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -64,9 +66,42 @@ public class ConcernService extends CommonService{
         }
 
         // 有则更新无则插入，这里针对mysql只发一条sql完成操作
-        // 常规操作是两步完成，1-先查，2-后插入或更新
+        // 常规操作是：有则删除，无则插入
+        // 这里用空间换时间
         concern.setConcern(concern1);
         concernMapper.fInsertOrUpdateOne(concern);
+        return ResponseData.success();
+    }
+
+    /**
+     * 前台用户批量关注
+     * @param ids
+     * @return
+     */
+    public ResponseData fWenyunBatchInsert(List<Integer> ids) {
+        Integer uid = getUserId();
+        if (uid == null) {
+            return ResponseData.error(ErrorMsg.KEEP_LOGIN_ERROR);
+        }
+        // 先删除当前用户在问云模块关注的话题，且对应话题的关注数目-1
+        Example example = new Example(Concern.class);
+        Example.Criteria criteria1 = example.createCriteria();
+        criteria1.andEqualTo("uid", uid);
+        criteria1.andIn("oid", ids);
+        concernMapper.deleteByExample(example);
+        for (Integer oid : ids) {
+            topicContentMapper.updateConcernAddValueById(oid, -1);
+        }
+
+        // 再插入当前用户在问云模块关注的话题，且对应话题的关注数目+1
+        for (Integer oid : ids) {
+            Concern concern = new Concern();
+            concern.setOid(oid);
+            concern.setUid(uid);
+            concern.setType((byte)2);
+            concernMapper.insertSelective(concern);
+            topicContentMapper.updateConcernAddValueById(oid, +1);
+        }
         return ResponseData.success();
     }
 }

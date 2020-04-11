@@ -11,6 +11,9 @@ public class ErrorMsg {
     public static final String ERROR_404 = "请求的资源暂未找到";
     public static final String ERROR_500 = "系统繁忙，请稍后重试";
 
+    /** http请求 */
+    public static final String REQUEST_REPEAT = "不能重复请求~";
+
     /** 安全错误 */
     public static final String GET_SK_ERROR = "获取密钥失败";
     public static final String SK_EXPIRE_ERROR = "密钥已失效";
@@ -51,6 +54,6 @@ public class ErrorMsg {
     public static final String POWER_BEUSED = "权限被占用,操作失败";
     public static final String POWER_BEUSEDBYCHILD = "存在权限被子权限占用,操作失败";
 
-    /** http请求 */
-    public static final String REQUEST_REPEAT = "不能重复请求~";
+    /** doc */
+    public static final String CLASS_USED = "该类别被占用,无法删除";
 }

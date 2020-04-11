@@ -1,4 +1,4 @@
-package com.zx.yunqishe.controller.topic;
+package com.zx.yunqishe.controller.topic_class;
 
 import com.zx.yunqishe.common.annotation.Decrypt;
 import com.zx.yunqishe.common.annotation.Encrypt;
@@ -9,13 +9,11 @@ import com.zx.yunqishe.service.topic.TopicService;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -78,4 +76,15 @@ public class TopicController {
      */
     @GetMapping(API.FRONTEND + API.SELECT + API.ONE)
     public ResponseData fSelectOne(@RequestParam Integer id) {return topicService.fSelectOne(id);}
+
+    /**
+     * 前台问云获取已关注和未关注话题
+     * 因为前台UI显示问题，所以总共最多只能查7个话题
+     * @param max
+     * @return
+     */
+    @GetMapping(API.FRONTEND + "/wenyun" + API.SELECT + API.LIST)
+    public ResponseData fWenyunSelectList(@RequestParam(value = "max", defaultValue = "7") Integer max) {
+        return topicService.fWenyunSelectList(max);
+    }
 }

@@ -1,12 +1,20 @@
 package com.zx.yunqishe.common.consts;
-
+/**
+ * 接口规范，非必需按照这个来
+ *
+ * /实体/端/[特殊功能]/[批量]/操作/[单个或列表]
+ * 其中[xxx]表示xxx可选
+ * 如：
+ * /topic/b/forum/batch/update  => 后台批量更新话题【类别：论坛】
+ * /topic/f/select/list         => 前台查询话题列表
+ */
 public class API {
 
     /** 401,404 , 403,500*/
     public static final String ERROR = "/error";
     public static final String MY_ERROR= "/myerror";
 
-    /** 安全类 */
+    /** 安全类api前缀 */
     public static final String SECURITY = "/security";
     /** 请求公钥 */
     public static final String GET_PK = "/getpk";
@@ -29,6 +37,7 @@ public class API {
     public static final String DELETE = "/delete";
     public static final String UPDATE = "/update";
     public static final String SELECT = "/select";
+    public static final String ONE_OR_LIST = "/oneOrList";
     public static final String INSERT_OR_UPDATE = "/insertOrUpdate";
 
     /** 是否登录和记住我 */
@@ -66,4 +75,8 @@ public class API {
     public static final String CONCERN = "/concern";
     /**  点赞或反对api前缀 */
     public static final String THUMB = "/thumb";
+    /** 文档分类api前缀 */
+    public static final String DOC = "/doc";
+    /** 文档内容api前缀 */
+    public static final String DOC_CONTENT = "/docContent" ;
 }

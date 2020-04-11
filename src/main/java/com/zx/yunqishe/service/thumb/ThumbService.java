@@ -82,6 +82,8 @@ public class ThumbService extends CommonService{
         }
 
         // 点赞或反对添加到thumb表，有则更新，无则插入
+        // 常规操作是：有则删除，无则插入
+        // 这里用空间换时间
         thumb.setThumb(value);
         thumbMapper.fInsertOrUpdateOne(thumb);
         return ResponseData.success();
