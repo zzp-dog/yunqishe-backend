@@ -30,25 +30,64 @@ import java.util.Map;
 @Configuration
 public class ShiroConfig {
 
-    // 应该是从数据查的，先写死
+    // 开放api，不需要登录，用ajax请求时需要同源，开发时可用前端node.js代理
     public static final String[] OPEN_APIS = {
-            API.SECURITY + API.GET_PK,
-            API.SECURITY + API.SEND_SK,
-            API.USER + API.IS_RECORD,
-            API.USER + API.SEND_CODE,
-            API.USER + API.VERIFY_CODE,
-            API.USER + API.QUERY_ADMIN,
-            API.USER + API.REGIST,
-            API.USER + API.INSTALL,
-            API.USER + API.LOGIN,
-            API.USER + API.LOGOUT,
-            API.TOPIC + API.FRONTEND + API.SELECT + API.ONE,
-            API.TOPIC + API.FRONTEND + API.SELECT + API.LIST,
-            API.TOPIC + API.FRONTEND + "wenyun"+ API.SELECT + API.LIST,
-            API.TOPIC_CONTENT + API.FRONTEND + API.SELECT + API.ONE,
-            API.TOPIC_CONTENT + API.FRONTEND + API.SELECT + API.LIST,
-            API.TOPIC_COMMENT + API.FRONTEND + API.SELECT + API.ONE,
-            API.TOPIC_COMMENT + API.FRONTEND + API.SELECT + API.LIST
+            // 全局404等错误
+            API.ERROR+API.MY_ERROR,
+            // 客户端获取公钥
+            API.SECURITY+API.GET_PK,
+            // 客户端上送密钥
+            API.SECURITY+API.SEND_SK,
+            // 用户是否登录或被记住
+            API.USER+API.IS_RECORD,
+            // 发送验证码
+            API.USER+API.SEND_CODE,
+            // 验证验证码
+            API.USER+API.VERIFY_CODE,
+            // 应用起始点
+            API.USER+API.SETUP,
+            // 用户注册
+            API.USER+API.REGIST,
+            // 用户安装
+            API.USER+API.INSTALL,
+            // 用户登录
+            API.USER+API.LOGIN,
+            // 用户登出
+            API.USER+API.LOGOUT,
+
+            // 前台查询经验等级表
+            API.LEVEL+API.FRONTEND+API.SELECT+API.LIST,
+
+            // 前台查询某个话题分类
+            API.TOPIC_CLASS+API.FRONTEND+API.SELECT+API.ONE,
+            // 前台查询话题分类列表
+            API.TOPIC_CLASS+API.FRONTEND+API.SELECT+API.LIST,
+
+            // 前台查询某一话题内容
+            API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+API.ONE,
+            // 前台查询话题内容列表
+            API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+API.LIST,
+            // 前台查询话题内容回复列表
+            API.TOPIC_COMMENT+API.FRONTEND+API.SELECT+API.LIST,
+
+            // 前台查询文档前两级分类
+            API.DOC_CLASS+API.FRONTEND+API.SELECT+"/top2lv"+API.LIST,
+            // 前台查询文档后两级分类
+            API.DOC_CLASS+API.FRONTEND+API.SELECT+"/end2lv"+API.LIST,
+            // 文档之节
+            API.DOC_CONTENT+API.FRONTEND+API.SELECT+API.ONE,
+
+            // 媒体前两级分类
+            API.MEDIA_CLASS+API.FRONTEND+API.SELECT+"/top2lv"+API.LIST,
+            // 媒体二级分类和其子内容
+            API.MEDIA_CLASS+API.FRONTEND+API.SELECT+API.ONE_WITH_CHILDREN,
+            // 请求媒体内容
+            API.MEDIA_CONTENT+API.FRONTEND+API.SELECT+API.ONE,
+
+            // 前台查询活跃用户
+            API.USER+API.FRONTEND+API.SELECT+"/active"+API.LIST,
+            // 台查询话题分类之问答推荐分类列表
+            API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+"/recommend"+API.LIST,
     };
 
     @Bean(name = "shiroFilter")

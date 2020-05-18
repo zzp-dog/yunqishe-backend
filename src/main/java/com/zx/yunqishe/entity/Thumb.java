@@ -33,10 +33,8 @@ public class Thumb {
      */
     private Byte thumb;
     /**
-     * 1-话题内容，2-话题内容回复
+     * 1-话题内容，2-话题内容回复，3-媒体内容，4-媒体内容回复，5-用户
      */
     @NotNull
-    @Max(2)
-    @Min(1)
     private Byte type;
 }

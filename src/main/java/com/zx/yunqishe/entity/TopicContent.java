@@ -1,18 +1,20 @@
 package com.zx.yunqishe.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.zx.yunqishe.entity.base.Content;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.*;
 
 @Table(name = "topic_content")
 @Setter
 @Getter
-public class TopicContent {
+public class TopicContent extends Content{
     /**
-     * 自增节id
+     * 自增id
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,8 +43,8 @@ public class TopicContent {
     /**
      * 浏览次数
      */
-    @Column(name = "view")
-    private Integer view;
+    @Column(name = "view_count")
+    private Integer viewCount;
 
     /**
      * 1-精华, 0-否
@@ -64,11 +66,6 @@ public class TopicContent {
      * 1-可见，0-不可见
      */
     private Byte visible;
-
-    /**
-     * 1-收费，0-不收费
-     */
-    private Byte charge;
 
     /**
      * 封面地址url
@@ -115,45 +112,64 @@ public class TopicContent {
     /**
      * 收藏数
      */
-    private Integer concern;
+    @Column(name = "concern_count")
+    private Integer concernCount;
 
     /**
      * 点赞数
      */
-    private Integer thumbup;
+    @Column(name="thumbup_count")
+    private Integer thumbupCount;
 
     /**
      * 反对数
      */
-    private Integer thumbdown;
+    @Column(name = "thumbdown_count")
+    private Integer thumbdownCount;
 
     /**
      * 转发数
      */
-    private Integer forward;
+    @Column(name="forward_count")
+    private Integer forwardCount;
 
     /**
-     * 所属模块0-论坛，1-问云
+     * 所属模块0-圈子，1-问云
      */
-
-    private Byte wt;
-    /**
-     * 作者姓名
-     */
-    @Transient
-    private User user;
+    private Byte type;
 
     /**
-     * 分类名称
+     * 内容查看策略 1-免费，2-需支付云币，3-仅需开通vip，4-vip半价
      */
-    @Transient
-    private Topic topic;
+    private Byte strategy;
+
+    /**
+     * 状态 1-审核中，2-被退回，3-审核通过
+     */
+    private Byte status;
+
+    /**
+     * 价格多少云币
+     */
+    private BigDecimal price;
 
     /**
      * 评论数
      */
     @Column(name = "comment_count")
     private Integer commentCount;
+
+    /**
+     * 作者
+     */
+    @Transient
+    private User user;
+
+    /**
+     * 所属分类
+     */
+    @Transient
+    private TopicClass topicClass;
 
     /**
      * 是否被当前用户关注
@@ -166,4 +182,10 @@ public class TopicContent {
      */
     @Transient
     private Thumb thumbInfo;
+
+    /**
+     * 0 - 有权限，1-需要登录，2 - 需全价支付云币，3-用户需要开通会员，4-会员需要开通会员后优惠，5-优惠支付云币（会员特权）
+     */
+    @Transient
+    protected Byte privilegeType;
 }

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.MediaContentMapper">
+    <resultMap id="mediaContent" type="MediaContent">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="pid" jdbcType="INTEGER" property="pid"/>
+        <result column="top" jdbcType="TINYINT" property="top"/>
+        <result column="url" jdbcType="TINYINT" property="url"/>
+        <result column="good" jdbcType="TINYINT" property="good"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="cover" jdbcType="VARCHAR" property="cover"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="device" jdbcType="TINYINT" property="device"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="strategy" jdbcType="TINYINT" property="strategy"/>
+        <result column="introduce" jdbcType="VARCHAR" property="introduce"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="view_count" jdbcType="INTEGER" property="viewCount"/>
+        <result column="concern_count" jdbcType="INTEGER" property="concernCount"/>
+        <result column="comment_count" jdbcType="INTEGER" property="commentCount"/>
+        <result column="forward_count" jdbcType="INTEGER" property="forwardCount"/>
+        <result column="thumbup_count" jdbcType="INTEGER" property="thumbupCount"/>
+    </resultMap>
+
+    <!--前台根据用户id查用户话题动态，联合查询-->
+    <select id="fSelectDynamicList" resultMap="mediaContent">
+        SELECT
+            a.id,
+            a.pid,
+            a.title,
+            a.cover,
+            a.introduce,
+            a.view_count,
+            a.concern_count,
+            a.comment_count,
+            a.forward_count,
+            a.thumbup_count,
+            a.strategy,
+            a.price,
+            a.create_time,
+            a.update_time,
+            a.top,
+            a.good,
+            a.device,
+            a.address,
+            a.type
+        FROM
+            media_content a
+        WHERE
+            a.uid = #{uid}
+            AND a.type = #{type}
+            AND a.STATUS = 2
+            AND a.visible = 1
+        ORDER BY
+            a.top,
+            a.good,
+            a.create_time
+        DESC
+    </select>
+</mapper>

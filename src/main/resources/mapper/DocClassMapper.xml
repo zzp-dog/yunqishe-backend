@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.DocClassMapper">
+  <resultMap id="docClass" type="DocClass">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="pid" jdbcType="TINYINT" property="pid" />
+    <result column="sid" jdbcType="TINYINT" property="sid" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="cover" jdbcType="VARCHAR" property="cover"/>
+    <result column="level" jdbcType="TINYINT" property="level"/>
+    <result column="price" jdbcType="DECIMAL" property="price"/>
+    <result column="visible" jdbcType="TINYINT" property="visible" />
+    <result column="strategy" jdbcType="TINYINT" property="strategy"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <collection property="docClasses" ofType="DocClass" javaType="List">
+      <id column="id2" jdbcType="INTEGER" property="id" />
+      <result column="NAME2" jdbcType="VARCHAR" property="name" />
+    </collection>
+  </resultMap>
+
+  <!--前台查询前两级分类文档-->
+  <select id="fSelectTop2lvList" resultMap="docClass">
+    SELECT
+    a.*,b.id as id2 ,b.NAME as NAME2
+    FROM
+    doc_class a
+    LEFT JOIN
+    doc_class b
+    ON
+    b.pid = a.id
+    AND
+    b.level = 2
+    WHERE
+    a.level = 1
+    ORDER BY a.sid,b.sid
+  </select>
+
+  <!--前台查询后两级：3级分类章和节-->
+  <select id="fSelectEnd2lvList" resultMap="docClass">
+    SELECT
+    a.*,b.id as id2 ,b.NAME as NAME2
+    FROM
+    doc_class a
+    LEFT JOIN
+    doc_content b
+    ON
+    b.pid = a.id
+    AND
+    a.level = 3
+    WHERE
+    a.pid = #{pid}
+    ORDER BY a.sid,b.sid
+  </select>
+</mapper>

@@ -1,258 +1,314 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zx.yunqishe.dao.TopicContentMapper">
-  <resultMap id="topicContent" type="com.zx.yunqishe.entity.TopicContent">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="uid" jdbcType="INTEGER" property="uid" />
-    <result column="tid" jdbcType="INTEGER" property="tid" />
-    <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="introduce" jdbcType="VARCHAR" property="introduce" />
-    <result column="view" jdbcType="INTEGER" property="view" />
-    <result column="good" jdbcType="TINYINT" property="good" />
-    <result column="top" jdbcType="TINYINT" property="top" />
-    <result column="MODIFY" jdbcType="TINYINT" property="modify" />
-    <result column="visible" jdbcType="TINYINT" property="visible" />
-    <result column="charge" jdbcType="TINYINT" property="charge" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="text" jdbcType="LONGVARCHAR" property="text" />
-    <result column="cover" jdbcType="VARCHAR" property="cover"/>
-    <result column="wt" jdbcType="TINYINT" property="wt"/>
-    <result column="concern" jdbcType="INTEGER" property="concern"/>
-    <result column="thumbup" jdbcType="INTEGER" property="thumbup"/>
-    <result column="forward" jdbcType="INTEGER" property="forward"/>
-    <result column="comment_count" jdbcType="INTEGER" property="commentCount"/>
-  </resultMap>
+    <resultMap id="topicContent" type="TopicContent">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="pid" jdbcType="INTEGER" property="pid"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="introduce" jdbcType="VARCHAR" property="introduce"/>
+        <result column="good" jdbcType="TINYINT" property="good"/>
+        <result column="top" jdbcType="TINYINT" property="top"/>
+        <result column="MODIFY" jdbcType="TINYINT" property="modify"/>
+        <result column="visible" jdbcType="TINYINT" property="visible"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="text" jdbcType="LONGVARCHAR" property="text"/>
+        <result column="cover" jdbcType="VARCHAR" property="cover"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="concern" jdbcType="INTEGER" property="concern"/>
+        <result column="view_count" jdbcType="INTEGER" property="viewCount"/>
+        <result column="thumbup_count" jdbcType="INTEGER" property="thumbupCount"/>
+        <result column="forward_count" jdbcType="INTEGER" property="forwardCount"/>
+        <result column="comment_count" jdbcType="INTEGER" property="commentCount"/>
+        <result column="concern_count" jdbcType="INTEGER" property="concernCount"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="strategy" jdbcType="TINYINT" property="strategy"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+    </resultMap>
 
-  <!--查话题内容带用户部分信息和用户角色部分信息，以及是否被当前用户收藏信息-->
-  <resultMap id="topicContentWithUserWithRoles" type="com.zx.yunqishe.entity.TopicContent">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="uid" jdbcType="INTEGER" property="uid" />
-    <result column="tid" jdbcType="INTEGER" property="tid" />
-    <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="introduce" jdbcType="VARCHAR" property="introduce" />
-    <result column="view" jdbcType="INTEGER" property="view" />
-    <result column="good" jdbcType="TINYINT" property="good" />
-    <result column="top" jdbcType="TINYINT" property="top" />
-    <result column="MODIFY" jdbcType="TINYINT" property="modify" />
-    <result column="visible" jdbcType="TINYINT" property="visible" />
-    <result column="charge" jdbcType="TINYINT" property="charge" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="text" jdbcType="LONGVARCHAR" property="text" />
-    <result column="cover" jdbcType="VARCHAR" property="cover"/>
-    <result column="wt" jdbcType="TINYINT" property="wt"/>
-    <result column="concern" jdbcType="INTEGER" property="concern"/>
-    <result column="thumbup" jdbcType="INTEGER" property="thumbup"/>
-    <result column="forward" jdbcType="INTEGER" property="forward"/>
-    <result column="comment_count" jdbcType="INTEGER" property="commentCount"/>
-    <!--关联用户-->
-    <association property="user" javaType="User">
-      <result column="user_name" jdbcType="VARCHAR" property="name"/>
-      <result column="user_avator" jdbcType="VARCHAR" property="avator"/>
-      <result column="user_nickname" jdbcType="VARCHAR" property="nickname"/>
-      <result column="user_designation" jdbcType="VARCHAR" property="designation"/>
-      <!--用户的角色-->
-      <collection property="roles" ofType="Role">
-        <result column="role_name" jdbcType="VARCHAR" property="name"/>
-        <result column="role_description" jdbcType="VARCHAR" property="description"/>
-      </collection>
-    </association>
-    <!--是否被当前用户收藏-->
-    <association property="concernInfo" javaType="Concern">
-      <result column="concern_concern" jdbcType="TINYINT" property="concern"/>
-    </association>
-    <!--是否被当前用户点赞或反对-->
-    <association property="thumbInfo" javaType="Thumb">
-      <result column="thumb_thumb" jdbcType="TINYINT" property="thumb"/>
-    </association>
-  </resultMap>
+    <!--查话题内容带用户部分信息和用户角色部分信息，以及是否被当前用户收藏信息-->
+    <resultMap id="topicContentWithUserWithRoles" type="com.zx.yunqishe.entity.TopicContent">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="pid" jdbcType="INTEGER" property="pid"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="introduce" jdbcType="VARCHAR" property="introduce"/>
+        <result column="good" jdbcType="TINYINT" property="good"/>
+        <result column="top" jdbcType="TINYINT" property="top"/>
+        <result column="MODIFY" jdbcType="TINYINT" property="modify"/>
+        <result column="visible" jdbcType="TINYINT" property="visible"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="text" jdbcType="LONGVARCHAR" property="text"/>
+        <result column="cover" jdbcType="VARCHAR" property="cover"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="concern" jdbcType="INTEGER" property="concern"/>
+        <result column="view_count" jdbcType="INTEGER" property="viewCount"/>
+        <result column="thumbup_count" jdbcType="INTEGER" property="thumbupCount"/>
+        <result column="forward_count" jdbcType="INTEGER" property="forwardCount"/>
+        <result column="comment_count" jdbcType="INTEGER" property="commentCount"/>
+        <result column="concern_count" jdbcType="INTEGER" property="concernCount"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="strategy" jdbcType="TINYINT" property="strategy"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <!--关联用户-->
+        <association property="user" javaType="User">
+            <result column="user_name" jdbcType="VARCHAR" property="name"/>
+            <result column="user_avator" jdbcType="VARCHAR" property="avator"/>
+            <result column="user_nickname" jdbcType="VARCHAR" property="nickname"/>
+            <result column="user_designation" jdbcType="VARCHAR" property="designation"/>
+            <!--用户的角色-->
+            <collection property="roles" ofType="Role">
+                <result column="role_name" jdbcType="VARCHAR" property="name"/>
+                <result column="role_description" jdbcType="VARCHAR" property="description"/>
+            </collection>
+        </association>
+        <!--是否被当前用户收藏-->
+        <association property="concernInfo" javaType="Concern">
+            <result column="concern_concern" jdbcType="TINYINT" property="concern"/>
+        </association>
+        <!--是否被当前用户点赞或反对-->
+        <association property="thumbInfo" javaType="Thumb">
+            <result column="thumb_thumb" jdbcType="TINYINT" property="thumb"/>
+        </association>
+    </resultMap>
 
-  <!--查询话题内容列表-->
-  <select id="selectTopicContentList" resultMap="topicContent">
-    SELECT a.* ,b.name as authorName FROM topic_content a
-    LEFT JOIN user b ON a.uid = b.id
-    LEFT JOIN topic c ON c.id = a.tid
-    <where>
-      <trim suffixOverrides="AND">
-        <!-- 所属模块 -->
-        <if test="searchModule != null and searchModule != -1">
-          c.wt = #{searchModule}
-        </if>
-        <!-- 所属分类 -->
-        <if test="searchCategory!= null and searchCategory != -1">
-          AND  a.tid = #{searchCategory}
-        </if>
-        <!-- 是否可见 -->
-        <if test="searchVisible != null and searchVisible != -1">
-          AND a.visible = #{searchVisible}
-        </if>
-        <!-- 是否收费-->
-        <if test="searchCharge != null and searchCharge != -1">
-          AND a.charge = #{searchCharge}
-        </if>
-        <!-- 标题模糊查询 -->
-        <if test='searchTitle != null and !"".equals(searchTitle)'>
-          AND a.title like #{searchTitle}
-        </if>
-      </trim>
-    </where>
-  </select>
+    <!--查询话题内容列表-->
+    <select id="selectTopicContentList" resultMap="topicContent">
+        SELECT a.* ,b.name as authorName FROM topic_content a
+        LEFT JOIN user b ON a.uid = b.id
+        LEFT JOIN topic_class c ON c.id = a.pid
+        <where>
+            <trim suffixOverrides="AND">
+                <!-- 所属模块 -->
+                <if test="searchModule != null and searchModule != -1">
+                    c.type = #{searchModule}
+                </if>
+                <!-- 所属分类 -->
+                <if test="searchCategory!= null and searchCategory != -1">
+                    AND a.pid = #{searchCategory}
+                </if>
+                <!-- 是否可见 -->
+                <if test="searchVisible != null and searchVisible != -1">
+                    AND a.visible = #{searchVisible}
+                </if>
+                <!-- 是否收费-->
+                <if test="searchStrategy != null and searchStrategy != -1">
+                    AND a.strategy = #{searchStrategy}
+                </if>
+                <!-- 标题模糊查询 -->
+                <if test='searchTitle != null and !"".equals(searchTitle)'>
+                    AND a.title like #{searchTitle}
+                </if>
+            </trim>
+        </where>
+    </select>
 
-  <!--根据id批量更新话题内容-->
-  <update id="batchUpdateTopicContent">
-    <foreach collection="contents" item="content" separator=";">
-      update topic_content
-      <set>
+    <!--根据id批量更新话题内容-->
+    <update id="batchUpdateTopicContent">
+        <foreach collection="contents" item="content" separator=";">
+            update topic_content
+            <set>
+                <trim suffixOverrides=",">
+                    <if test="content.pid != null">
+                        pid = #{content.pid},
+                    </if>
+                    <if test="content.visible != null">
+                        visible = #{content.visible},
+                    </if>
+                    <if test="content.strategy != null">
+                        strategy = #{content.strategy},
+                    </if>
+                    <if test='content.title != null and !"".equals(content.title)'>
+                        title = #{content.title},
+                    </if>
+                    <if test='content.cover != null and !"".equals(content.cover)'>
+                        cover = #{content.cover},
+                    </if>
+                    <if test='content.introduce != null and !"".equals(content.introduce)'>
+                        introduce = #{content.introduce},
+                    </if>
+                    <if test='content.text != null and !"".equals(content.text)'>
+                        text = #{content.text}
+                    </if>
+                </trim>
+            </set>
+            <where>
+                id = #{content.id}
+            </where>
+        </foreach>
+    </update>
+
+    <!-- 前台获取论坛帖子列表 type2：非2，3，4，5-全站（不用判断），2-最近，3-精华，4-人气，5-随机 -->
+    <select id="fSelectList" resultMap="topicContent">
+        SELECT
+        a.id,
+        a.pid,
+        a.cover,
+        a.title,
+        a.strategy,
+        a.device,
+        a.concern_count,
+        a.thumbup_count,
+        a.address,
+        a.introduce,
+        a.view_count,
+        a.create_time,
+        a.update_time,
+        a.comment_count,
+        a.forward_count
+        FROM
+        topic_content a
+        WHERE
+        type = #{type1}
+        AND
+        visible = 1
+        AND
+        status = 2
+        <if test="pid != null and pid != -1">
+            AND
+            pid = #{pid}
+        </if>
+        ORDER BY
+        top
         <trim suffixOverrides=",">
-          <if test="content.tid != null">
-            tid = #{content.tid},
-          </if>
-          <if test="content.visible != null">
-            visible = #{content.visible},
-          </if>
-          <if test="content.charge != null">
-            charge = #{content.charge},
-          </if>
-          <if test='content.title != null and !"".equals(content.title)'>
-            title = #{content.title},
-          </if>
-          <if test='content.cover != null and !"".equals(content.cover)'>
-            cover = #{content.cover},
-          </if>
-          <if test='content.introduce != null and !"".equals(content.introduce)'>
-            introduce = #{content.introduce},
-          </if>
-          <if test='content.text != null and !"".equals(content.text)'>
-            text = #{content.text}
-          </if>
+            <if test="type2 == 2">
+                ,create_time
+            </if>
+            <if test="type2 == 3">
+                ,good
+            </if>
+            <if test="type2 == 4">
+                ,thumbup_count
+            </if>
+            <if test="type2 == 5">
+                ,RAND()
+            </if>
         </trim>
-      </set>
-      <where>
-        id = #{content.id}
-      </where>
-    </foreach>
-  </update>
+        DESC
+    </select>
 
-  <!-- 前台获取论坛帖子列表 type：非2，3，4，5-全站（不用判断），2-最近，3-精华，4-人气，5-随机 -->
-  <select id="fSelectList" resultMap="topicContent">
-    SELECT
-      a.id,
-      a.tid,
-      a.cover,
-      a.title,
-      a.charge,
-      a.device,
-      a.concern,
-      a.thumbup,
-      a.address,
-      a.introduce,
-      a.view,
-      a.create_time,
-      a.update_time,
-      a.comment_count,
-      a.forward
-    FROM
-      topic_content a
-    WHERE
-      wt = #{wt}
-    AND
-      visible = 1
-    <if test="tid != null and tid != -1">
-      AND
-        tid = #{tid}
-    </if>
-    ORDER BY
-      top
-    <trim suffixOverrides=",">
-      <if test="type == 2">
-        ,create_time
-      </if>
-      <if test="type == 3">
-        ,good
-      </if>
-      <if test="type == 4">
-        ,thumbup
-      </if>
-      <if test="type == 5">
-        ,RAND()
-      </if>
-    </trim>
-    DESC
-  </select>
+    <!--前台根据话题内容id查询话题内容 带收藏信息-->
+    <select id="fSelectOne" resultMap="topicContentWithUserWithRoles">
+        SELECT
+        a.*,
+        b.name as user_name,
+        b.avator as user_avator,
+        b.nickname as user_nickname,
+        b.designation as user_designation,
+        d.name as role_name,
+        d.description as role_description
+        <if test="uid != null and uid != -1">
+            ,e.concern as concern_concern,
+            f.thumb as thumb_thumb
+        </if>
+        FROM
+        topic_content a
+        INNER JOIN
+        user b
+        ON
+        a.uid = b.id
+        LEFT JOIN
+        user_role c
+        ON
+        c.user_id = b.id
+        INNER JOIN
+        role d
+        ON
+        d.id = c.role_id
+        <if test="uid !=null and uid != -1">
+            LEFT JOIN
+            concern e
+            ON
+            e.oid = a.id
+            AND
+            e.type = 1
+            AND
+            e.uid = #{uid}
+            LEFT JOIN
+            thumb f
+            ON
+            f.oid = a.id
+            AND
+            f.uid = #{uid}
+        </if>
+        <where>
+            a.id = #{id}
+            AND
+            a.status = 2
+        </where>
+    </select>
 
-  <!--前台根据话题内容id查询话题内容 带收藏信息-->
-  <select id="fSelectOne" resultMap="topicContentWithUserWithRoles">
-    SELECT
-      a.*,
-      b.name as user_name,
-      b.avator as user_avator,
-      b.nickname as user_nickname,
-      b.designation as user_designation,
-      d.name as role_name,
-      d.description as role_description
-      <if test="uid != null and uid != -1">
-        ,e.concern as concern_concern,
-        f.thumb as thumb_thumb
-      </if>
-    FROM
-      topic_content a
-    INNER JOIN
-      user b
-    ON
-      a.uid = b.id
-    LEFT JOIN
-      user_role c
-    ON
-      c.user_id = b.id
-    INNER JOIN
-      role d
-    ON
-      d.id = c.role_id
-    <if test="uid !=null and uid != -1">
-      LEFT JOIN
-        concern e
-      ON
-        e.oid = a.id
-      AND
-        e.type = 1
-      AND
-        e.uid = #{uid}
-      LEFT JOIN
-        thumb f
-      ON
-        f.oid = a.id
-      AND
-        f.uid = #{uid}
-    </if>
-    <where>
-      a.id = #{id}
-    </where>
-  </select>
+    <!--前台根据用户id查用户话题动态，联合查询-->
+    <select id="fSelectDynamicList" resultMap="topicContent">
+        SELECT
+            a.id,
+            a.pid,
+            a.title,
+            a.cover,
+            a.introduce,
+            a.view_count,
+            a.concern_count,
+            a.comment_count,
+            a.forward_count,
+            a.thumbup_count,
+            a.strategy,
+            a.price,
+            a.create_time,
+            a.update_time,
+            a.top,
+            a.good,
+            a.device,
+            a.address,
+            a.type
+        FROM
+            topic_content a
+        WHERE
+            a.uid = #{uid}
+            AND a.type = #{type}
+            AND a.STATUS = 2
+            AND a.visible = 1
+        ORDER BY
+            a.top,
+            a.good,
+            a.create_time
+        DESC
+    </select>
 
-  <!--回复内容+1-->
-  <update id="updateCommentCountAddOneById">
-    UPDATE topic_content set comment_count = comment_count + 1 WHERE id = #{id}
-  </update>
+    <!--回复内容+1-->
+    <update id="updateCommentCountAddOneById">
+        UPDATE topic_content
+        SET comment_count = comment_count + 1
+        WHERE id = #{id}
+    </update>
 
-  <!--收藏或取消收藏话题内容-->
-  <update id="updateConcernAddValueById">
-    UPDATE topic_content set concern = concern + #{value} WHERE id = #{id}
-  </update>
+    <!--收藏或取消收藏话题内容-->
+    <update id="updateConcernAddValueById">
+        UPDATE topic_content
+        SET concern_count = concern_count + #{value}
+        WHERE id = #{id}
+    </update>
 
-  <!--通过加值，更新浏览次数-->
-  <update id="updateViewAddValueById">
-    UPDATE topic_content set view = view + #{value} WHERE id = #{id}
-  </update>
+    <!--通过加值，更新浏览次数-->
+    <update id="updateViewAddValueById">
+        UPDATE topic_content
+        SET view_count = view_count + #{value}
+        WHERE id = #{id}
+    </update>
 
-  <!--通过加值，更新点赞数-->
-  <update id="updateThumbupAddValueById">
-    UPDATE topic_content set thumbup = thumbup + #{value} WHERE id = #{id}
-  </update>
+    <!--通过加值，更新点赞数-->
+    <update id="updateThumbupAddValueById">
+        UPDATE topic_content
+        SET thumbup_count = thumbup_count + #{value}
+        WHERE id = #{id}
+    </update>
 
-  <!--通过加值，更新反对数-->
-  <update id="updateThumbdownAddValueById">
-    UPDATE topic_content set thumbdown = thumbdown + #{value} WHERE id = #{id}
-  </update>
+    <!--通过加值，更新反对数-->
+    <update id="updateThumbdownAddValueById">
+        UPDATE topic_content
+        SET thumbdown_count = thumbdown_count + #{value}
+        WHERE id = #{id}
+    </update>
 
 </mapper>

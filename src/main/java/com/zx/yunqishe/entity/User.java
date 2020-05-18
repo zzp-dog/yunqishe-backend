@@ -7,11 +7,14 @@ import com.zx.yunqishe.common.utils.Generator;
 import com.zx.yunqishe.common.utils.ValidatorUtil;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Value;
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.CacheNamespaceRef;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
@@ -19,13 +22,18 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
+
+/**
+ * 用户表
+ */
+
 // shiro记住我，User类需要实现序列化接口！！！
 // mybatis 二级缓存的查询也需要实现序列化接口
 @Getter
 @Setter
 public class User implements Serializable{
 
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     /**
      * 自增id
@@ -124,7 +132,7 @@ public class User implements Serializable{
     /**
      * 金币
      */
-    private Integer coin;
+    private BigDecimal coin;
 
     /**
      * 年龄
@@ -186,33 +194,26 @@ public class User implements Serializable{
     /**
      * 保持登录token
      */
+    @Transient
     private String token;
 
     /**
      * 验证码
      */
     @Column(name = "CODE")
+    @Transient
     private String code;
-
-    /**
-     * 被关注数
-     */
-    private Integer concern;
-
-    /**
-     * 等级
-     */
-    @Transient
-    private Integer level;
-
-    @Transient
-    private List<Role> roles;
-
-    /** 用户角色字符串，避免连查 */
-    @Column(name = "role_names")
-    private String roleNames;
 
     /** 合作商 0-否，1-否 */
     private Byte partner;
+
+    /**
+     * 用户角色
+     */
+    @Transient
+    private List<Role> roles;
+
+    @Transient
+    private List<String> roleNames;
 
 }

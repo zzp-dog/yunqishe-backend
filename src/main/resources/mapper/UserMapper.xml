@@ -37,8 +37,10 @@
         <result column="last_logout_time" property="lastLogoutTime"/>
         <result column="last_login_device" property="lastLoginDevice"/>
         <result column="last_logout_device" property="lastLogoutDevice"/>
-        <result column="role_names" property="roleNames"/>
         <result column="partner" property="partner"/>
+        <collection property="roleNames" ofType="string" javaType="list">
+            <result column="role_name"/>
+        </collection>
     </resultMap>
     <!--用户角色,一对多查询结果-->
     <resultMap id="userWithRoles" type="User">
@@ -74,12 +76,77 @@
         </collection>
     </resultMap>
 
+    <!--存贮在session的基本用户-->
+    <resultMap id="baseUser" type="User">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="coin" property="coin"/>
+        <result column="avator" property="avator"/>
+        <result column="nickname" property="nickname"/>
+        <result column="experience" property="experience"/>
+        <collection property="roleNames" ofType="string" javaType="list">
+            <result column="role_name"/>
+        </collection>
+    </resultMap>
+
+    <!--前台根据id查用户-->
+    <resultMap id="fUser" type="User">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="coin" property="coin"/>
+        <result column="avator" property="avator"/>
+        <result column="nickname" property="nickname"/>
+        <result column="experience" property="experience"/>
+        <collection property="roleNames" ofType="string" javaType="list">
+            <result column="role_name"/>
+        </collection>
+    </resultMap>
+
+    <!--根据用户账号查基本信息-->
+    <select id="selectBaseOneByAccount" resultMap="baseUser">
+        SELECT
+            a.id,
+            a.sex,
+            a.name,
+            a.coin,
+            a.avator,
+            a.nickname,
+            a.experience,
+            c.name AS role_name
+        FROM user a
+            LEFT JOIN user_role b
+                ON a.id = b.user_id
+            LEFT JOIN role c
+                ON c.id = b.role_id
+        WHERE a.account = #{account}
+    </select>
+
+    <!--根据用户账号查基本信息-->
+    <select id="fSelectOne" resultMap="fUser">
+        SELECT
+        a.id,
+        a.sex,
+        a.name,
+        a.coin,
+        a.avator,
+        a.address,
+        a.nickname,
+        a.experience,
+        c.name AS role_name
+        FROM user a
+        LEFT JOIN user_role b
+        ON a.id = b.user_id
+        LEFT JOIN role c
+        ON c.id = b.role_id
+        WHERE a.id = #{id}
+    </select>
+
     <!--查询用户角色权限，5表联查，这个地方属性名不能重复，否则会出现绑定混乱的情况。。。-->
     <select id="selectUserWithRolesWithPowers" resultMap="userWithRolesWithPowers">
         SELECT
             a.id,
-            c.NAME as rname,
-            e.NAME as pname
+            c.NAME AS rname,
+            e.NAME AS pname
         FROM
             USER a
             INNER JOIN user_role b ON a.id = b.user_id
@@ -88,7 +155,7 @@
             INNER JOIN power e ON d.power_id = e.id
         WHERE
             a.account = #{account};
-     </select>
+    </select>
 
     <!--条件查询用户带角色列表,对应rbac的人员管理的条件查询-，不包括回收站的用户-->
     <select id="selectUsersWithRolesByConditions" resultMap="userWithRoles">
@@ -129,17 +196,17 @@
     <!--根据用户id查询单条用户角色-->
     <select id="selectUserWithRolesByUserId" resultMap="userWithRoles">
         SELECT
-        a.*,
-        c.id AS rid,
-        c.description,
-        c.create_time,
-        c.pid
+            a.*,
+            c.id AS rid,
+            c.description,
+            c.create_time,
+            c.pid
         FROM
-        USER a
-        LEFT JOIN user_role b ON a.id = b.user_id
-        LEFT JOIN role c ON b.role_id = c.id
+            USER a
+            LEFT JOIN user_role b ON a.id = b.user_id
+            LEFT JOIN role c ON b.role_id = c.id
         WHERE
-        a.id = #{id};
+            a.id = #{id};
     </select>
     <!--根据批量用户id查询用户角色-->
     <select id="selectUserRolesUserIdIn" resultMap="userWithRoles">
@@ -155,13 +222,22 @@
 
     <!--查询活跃用户-->
     <select id="fSelectActiveList" resultMap="user">
-      SELECT
-      a.id,a.nickname,a.avator,a.experience,a.partner,a.role_names
-      FROM
-      user a
-      ORDER BY
-      last_login_time
-      ASC
+        SELECT
+            a.id,
+            a.nickname,
+            a.avator,
+            a.experience,
+            a.partner,
+            c.name AS role_name
+        FROM
+            user a
+            LEFT JOIN user_role b
+                ON a.id = b.user_id
+            LEFT JOIN role c
+                ON c.id = b.role_id
+        ORDER BY
+            a.last_login_time
+        ASC
     </select>
 
     <!--批量更新用户-->
@@ -242,7 +318,9 @@
 
     <!--关注或取消关注-->
     <update id="updateConcernAddValueById">
-        UPDATE topic set concern = concern + #{value} WHERE id = #{id}
+        UPDATE topic_class
+        SET concern = concern + #{value}
+        WHERE id = #{id}
     </update>
 
 </mapper>

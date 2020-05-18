@@ -207,11 +207,11 @@ public class EncryptUtil {
         System.out.println("测试字符串字节编解码-start");
         System.out.println("AES加解密");
         String str4 = "{\"account\":\"\",\"passowrd\":\"\"}";
-        System.out.println("原来的字符串：" + str4);
+        System.out.println("原来的字符串："+str4);
         String key = "CtY0TM2HZ5hrho0b";
         String encrpyt = AESEncrypt(str4, key);
-        System.out.println("AES加密后：" + encrpyt);
-        System.out.println("AES解密后：" + AESDecrypt(encrpyt, key));
+        System.out.println("AES加密后："+encrpyt);
+        System.out.println("AES解密后："+AESDecrypt(encrpyt, key));
 
     }
 }

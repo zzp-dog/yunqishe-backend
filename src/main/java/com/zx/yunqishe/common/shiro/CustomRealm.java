@@ -3,16 +3,13 @@ package com.zx.yunqishe.common.shiro;
 import com.zx.yunqishe.entity.Power;
 import com.zx.yunqishe.entity.Role;
 import com.zx.yunqishe.entity.User;
-import com.zx.yunqishe.service.user.UserService;
-import org.apache.shiro.SecurityUtils;
+import com.zx.yunqishe.service.UserService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 public class CustomRealm extends AuthorizingRealm {
 

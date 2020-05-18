@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.PayMapper">
+    <resultMap id="pay" type="Pay">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="value" jdbcType="DECIMAL" property="value"/>
+        <result column="pay_type" jdbcType="TINYINT" property="payType"/>
+        <result column="for_type" jdbcType="TINYINT" property="forType"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <association property="vipArg" javaType="VipArg">
+            <result column="type" jdbcType="TINYINT" property="type"/>
+            <result column="coin" jdbcType="DECIMAL" property="coin"/>
+            <result column="price" jdbcType="DECIMAL" property="price"/>
+            <result column="duration" jdbcType="INTEGER" property="duration"/>
+        </association>
+    </resultMap>
+
+    <!-- 查会员开通或续费记录，带会员配置表 -->
+    <select id="selectPaysWithVipArgByUid" resultMap="pay">
+        SELECT
+            a.*,
+            b.*
+        FROM
+            pay a
+            LEFT JOIN vip_arg b
+                ON a.aid = b.id
+                   AND a.for_type IN (2, 3)
+        WHERE a.uid = #{uid}
+    </select>
+
+</mapper>

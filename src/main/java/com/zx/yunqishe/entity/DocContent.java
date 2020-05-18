@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Table(name = "doc_content")
@@ -41,11 +42,6 @@ public class DocContent {
     private Byte visible;
 
     /**
-     * 1-收费，0-不收费
-     */
-    private Byte charge;
-
-    /**
      * 文档分类创建时间
      */
     @Column(name = "create_time")
@@ -63,7 +59,7 @@ public class DocContent {
      * 浏览次数
      */
     @Column(name = "view_count")
-    private Integer view;
+    private Integer view_count;
 
     /**
      * 更新时间
@@ -86,36 +82,20 @@ public class DocContent {
      */
     private String text;
 
-    public static void main(String[] args) {
-        DocContent doc = new DocContent();
-        Cat cat = doc.new Cat();
-        System.out.println(((Animal) cat).getName());
-    }
+    /**
+     内容查看策略 1-免费，2-需支付云币，3-仅需开通vip，4-vip半价
+     */
+    private Byte strategy;
 
-    class Animal {
-        private String name = "tiger";
+    /**
+     * 价格多少云币
+     */
+    private BigDecimal price;
 
-        public String getName() {
-            System.out.println("animal");
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-    }
-
-    class Cat extends Animal {
-        private String name = "tiger2";
-
-        public String getName() {
-            System.out.println("cat");
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-    }
+    /**
+     * 0 - 有权限，1-需要登录，2 - 需全价支付云币，3-用户需要开通会员，4-会员需要开通会员后优惠，5-优惠支付云币（会员特权）
+     */
+    @Transient
+    protected Byte privilegeType;
 
 }

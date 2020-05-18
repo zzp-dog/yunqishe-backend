@@ -2,7 +2,6 @@ package com.zx.yunqishe.dao;
 
 import com.zx.yunqishe.entity.User;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
@@ -60,4 +59,18 @@ public interface UserMapper extends Mapper<User> {
      * @return
      */
     List<User> fSelectActiveList();
+
+    /**
+     * 根据用户账号查用户基本信息
+     * @param account
+     * @return
+     */
+    User selectBaseOneByAccount(String account);
+
+    /**
+     * 前台根据用户id查用户id
+     * @param id
+     * @return
+     */
+    User fSelectOne(Integer id);
 }

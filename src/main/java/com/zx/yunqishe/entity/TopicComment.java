@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -82,10 +83,14 @@ public class TopicComment {
     private Byte visible;
 
     /**
-     * 是否收费
+     * 1-免费，2-全价支付云币，3-只需开通会员,4-开通会员半价
      */
-    private Byte charge;
+    private Byte strategy;
 
+    /**
+     * 需支付多少云币
+     */
+    private BigDecimal price;
     /**
      * 回复时所用设备
      */
@@ -110,12 +115,6 @@ public class TopicComment {
     private User who;
 
     /**
-     * 子回复
-     * @return
-     */
-    @Transient
-    private List<TopicComment> comments;
-    /**
      * 回复时定位
      */
     private String address;
@@ -123,15 +122,22 @@ public class TopicComment {
     /**
      * 点赞
      */
-    private Integer thumbup;
+    private Integer thumbupCount;
     /**
      * 反对
      */
-    private Integer thumbdown;
+    private Integer thumbdownCount;
 
     /**
      * 当前用户点赞或反对信息
      */
     @Transient
     private Thumb thumbInfo;
+
+    /**
+     * 子回复
+     * @return
+     */
+    @Transient
+    private List<TopicComment> comments;
 }

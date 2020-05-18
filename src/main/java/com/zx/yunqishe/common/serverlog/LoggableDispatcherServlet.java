@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Profile("dev")
 public class LoggableDispatcherServlet extends DispatcherServlet {
     private static final Logger logger = LoggerFactory.getLogger("HttpLogger");
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -39,14 +41,14 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
             if(method.equals("GET")) {
                 rootNode.set("request", mapper.valueToTree(requestWrapper.getParameterMap()));
             } else {
-                // 非json格式字符串(前端加密后数据不是json格式的字符串)会报错，首尾加上双引号
                 JsonNode newNode = null;
                 try{
                     newNode = mapper.readTree(requestWrapper.getContentAsByteArray());
                 } catch (Exception e) {
+                    // 异常时将接收的内容变成json字符串，打印看看是啥
+                    // 备注：非json格式字符串(如本项目前端加密后数据未转换为json字符串)会报错，首尾加上双引号
                     if (e instanceof JsonParseException) {
-                        // 首尾加上双引号
-                        String str = "\"" + new String(requestWrapper.getContentAsByteArray(), "UTF-8")+"\"";
+                        String str = "\""+new String(requestWrapper.getContentAsByteArray(), "UTF-8")+"\"";
                         newNode =   mapper.readTree(str.getBytes());
                     } else {
                         e.printStackTrace();
@@ -61,8 +63,9 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
 
             responseWrapper.copyBodyToResponse();
 
-            rootNode.set("responseHeaders", mapper.valueToTree(getResponsetHeaders(responseWrapper)));
-            logger.info(rootNode.toString());
+            rootNode.set("responseHeaders", mapper.valueToTree(getResponseHeaders(responseWrapper)));
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
+            logger.info(json);
         }
     }
 
@@ -77,7 +80,7 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
 
     }
 
-    private Map<String, Object> getResponsetHeaders(ContentCachingResponseWrapper response) {
+    private Map<String, Object> getResponseHeaders(ContentCachingResponseWrapper response) {
         Map<String, Object> headers = new HashMap<>();
         Collection<String> headerNames = response.getHeaderNames();
         for (String headerName : headerNames) {

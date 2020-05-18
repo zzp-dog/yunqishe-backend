@@ -1,8 +1,13 @@
 package com.zx.yunqishe.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Table(name = "concern")
+@Getter
+@Setter
 public class Concern {
     /**
      * 自增id
@@ -27,48 +32,9 @@ public class Concern {
     private Byte concern;
 
     /**
-     * 关注或收藏得是
-     * 1-话题内容，2-话题，3-用户
+     * 关注或收藏
+     * 1-话题内容，2-问云话题，3-圈子话题,4-媒体，5-媒体内容，6用户
      */
     private Byte type;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUid() {
-        return uid;
-    }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
-    public Integer getOid() {
-        return oid;
-    }
-
-    public void setOid(Integer oid) {
-        this.oid = oid;
-    }
-
-    public Byte getConcern() {
-        return concern;
-    }
-
-    public void setConcern(Byte concern) {
-        this.concern = concern;
-    }
-
-    public Byte getType() {
-        return type;
-    }
-
-    public void setType(Byte type) {
-        this.type = type;
-    }
 }

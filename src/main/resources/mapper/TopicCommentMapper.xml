@@ -8,7 +8,7 @@
         <result column="tcid" jdbcType="INTEGER" property="tcid"/>
         <result column="good" jdbcType="TINYINT" property="good"/>
         <result column="visible" jdbcType="TINYINT" property="visible"/>
-        <result column="charge" jdbcType="TINYINT" property="charge"/>
+        <result column="strategy" jdbcType="TINYINT" property="strategy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="text" jdbcType="LONGVARCHAR" property="text"/>
@@ -25,14 +25,14 @@
         <result column="tcid" jdbcType="INTEGER" property="tcid"/>
         <result column="good" jdbcType="TINYINT" property="good"/>
         <result column="visible" jdbcType="TINYINT" property="visible"/>
-        <result column="charge" jdbcType="TINYINT" property="charge"/>
+        <result column="strategy" jdbcType="TINYINT" property="strategy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="text" jdbcType="LONGVARCHAR" property="text"/>
         <result column="device" jdbcType="TINYINT" property="device"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
-        <result column="thumbup" jdbcType="INTEGER" property="thumbup"/>
-        <result column="thumbdown" jdbcType="INTEGER" property="thumbdown"/>
+        <result column="thumbup_count" jdbcType="INTEGER" property="thumbupCount"/>
+        <result column="thumbdown_count" jdbcType="INTEGER" property="thumbdownCount"/>
         <!--回复者-->
         <association property="user" javaType="User">
             <id column="user_id" property="id"/>
@@ -70,15 +70,15 @@
         <result column="tcid" jdbcType="INTEGER" property="tcid"/>
         <result column="good" jdbcType="TINYINT" property="good"/>
         <result column="visible" jdbcType="TINYINT" property="visible"/>
-        <result column="charge" jdbcType="TINYINT" property="charge"/>
+        <result column="strategy" jdbcType="TINYINT" property="strategy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="text" jdbcType="LONGVARCHAR" property="text"/>
         <result column="device" jdbcType="TINYINT" property="device"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="comment_count" javaType="INTEGER" property="commentCount"/>
-        <result column="thumbup" jdbcType="INTEGER" property="thumbup"/>
-        <result column="thumbdown" jdbcType="INTEGER" property="thumbdown"/>
+        <result column="thumbup_count" jdbcType="INTEGER" property="thumbupCount"/>
+        <result column="thumbdown_count" jdbcType="INTEGER" property="thumbdownCount"/>
         <result column="pageNum2" jdbcType="INTEGER"/>
         <result column="pageSize2" javaType="INTEGER"/>
         <association property="user" javaType="User">
@@ -113,8 +113,8 @@
                     AND a.visible = #{searchVisible}
                 </if>
                 <!-- 是否收费-->
-                <if test="searchCharge != null and searchCharge != -1">
-                    AND a.charge = #{searchCharge}
+                <if test="searchStrategy != null and searchStrategy != -1">
+                    AND a.strategy = #{searchStrategy}
                 </if>
                 <!-- 标题模糊查询 -->
                 <if test='searchText != null and !"".equals(searchText)'>
@@ -134,8 +134,8 @@
                     <if test="comment.visible != null">
                         visible = #{comment.visible},
                     </if>
-                    <if test="comment.charge != null">
-                        charge = #{comment.charge},
+                    <if test="comment.strategy != null">
+                        charge = #{comment.strategy},
                     </if>
                     <if test='comment.text != null and !"".equals(comment.text)'>
                         text = #{comment.text}
@@ -232,17 +232,17 @@
 
     <!--回复内容+1-->
     <update id="updateCommentCountAddOneById">
-        UPDATE topic_comment set comment_count = comment_count + 1 WHERE id = #{id}
+        UPDATE topic_comment set comment_count = comment_count+1 WHERE id = #{id}
     </update>
 
     <!--通过加值，更新点赞数-->
     <update id="updateThumbupAddValueById">
-        UPDATE topic_comment set thumbup = thumbup + #{value} WHERE id = #{id}
+        UPDATE topic_comment set thumbup_count = thumbup_count+#{value} WHERE id = #{id}
     </update>
 
     <!--通过加值，更新反对数-->
     <update id="updateThumbdownAddValueById">
-        UPDATE topic_comment set thumbdown = thumbdown + #{value} WHERE id = #{id}
+        UPDATE topic_comment set thumbdown_count = thumbdown_count+#{value} WHERE id = #{id}
     </update>
 
 </mapper>

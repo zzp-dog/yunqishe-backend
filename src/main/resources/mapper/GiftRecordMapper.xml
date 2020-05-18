@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.GiftRecordMapper">
+  <resultMap id="giftRecord" type="GiftRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uid1" jdbcType="INTEGER" property="uid1" />
+    <result column="known" jdbcType="INTEGER" property="known" />
+    <result column="gid" jdbcType="INTEGER" property="gid"/>
+    <result column="view_count" jdbcType="TINYINT" property="viewCount" />
+    <result column="count" jdbcType="INTEGER" property="count"/>
+    <result column="groupCount" jdbcType="INTEGER" property="groupCount"/>
+    <association property="gift" javaType="Gift">
+      <id column="id2" jdbcType="INTEGER" property="id"/>
+      <result column="name" jdbcType="VARCHAR" property="name"/>
+      <result column="url" jdbcType="VARCHAR" property="url"/>
+      <result column="charm_value" jdbcType="INTEGER" property="charmValue"/>
+      <result column="description" jdbcType="VARCHAR" property="description"/>
+    </association>
+  </resultMap>
+
+  <!--前台查询礼物发送记录列表,并统计每种礼物的数量作为groupCount属性赋给礼物记录表-->
+  <select id="selectSendReceiveWithGift" resultMap="giftRecord">
+    SELECT
+      a.gid,
+      a.uid1,
+      a.known,
+      b.id AS id2,
+      b.NAME,
+      b.url,
+      b.description,
+      b.charm_value,
+      SUM( a.count ) as groupCount
+    FROM
+      gift_record a
+      INNER JOIN gift b ON b.id = a.gid
+    WHERE
+      a.uid1 = #{uid}
+    GROUP BY
+      a.gid,
+      a.uid1,
+      a.known,
+      b.NAME,
+      b.url,
+      b.description,
+      b.charm_value
+  </select>
+</mapper>

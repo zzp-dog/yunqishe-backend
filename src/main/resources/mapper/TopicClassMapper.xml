@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.yunqishe.dao.TopicClassMapper">
+    <resultMap id="topicClass" type="TopicClass">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="sid" jdbcType="TINYINT" property="sid"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="NAME" jdbcType="VARCHAR" property="name"/>
+        <result column="visible" jdbcType="TINYINT" property="visible"/>
+        <!--0-圈子，1-问答-->
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="content_count" jdbcType="INTEGER" property="contentCount"/>
+        <result column="concern_count" jdbcType="INTEGER" property="concernCount"/>
+        <result column="cover" property="cover" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="level" jdbcType="INTEGER" property="level"/>
+        <association property="concernInfo" javaType="Concern">
+            <result column="concern_concern" jdbcType="TINYINT" property="concern"/>
+        </association>
+    </resultMap>
+
+    <!--批量插入-->
+    <insert id="batchInsert">
+        <foreach separator=";" item="topicClass" collection="topicClasses">
+            insert into topic_class
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="topicClass.sid != null">
+                    sid,
+                </if>
+                <if test="topicClass.uid != null">
+                    uid,
+                </if>
+                <if test='topicClass.name != null and !"".equals(topicClass.name)'>
+                    name,
+                </if>
+                <if test="topicClass.visible != null">
+                    visible,
+                </if>
+                <if test="topicClass.type != null">
+                    type,
+                </if>
+                <if test='topicClass.createTime != null and !"".equals(topicClass.createTime)'>
+                    create_time,
+                </if>
+            </trim>
+            VALUES
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="topicClass.sid != null">
+                    #{topicClass.sid},
+                </if>
+                <if test="topicClass.uid != null">
+                    #{topicClass.uid},
+                </if>
+                <if test='topicClass.name != null and !"".equals(topicClass.name)'>
+                    #{topicClass.name},
+                </if>
+                <if test="topicClass.visible != null">
+                    #{topicClass.visible},
+                </if>
+                <if test="topicClass.type != null">
+                    #{topicClass.type},
+                </if>
+                <if test='topicClass.createTime != null and !"".equals(topicClass.createTime)'>
+                    #{topicClass.createTime},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <!--批量更新-->
+    <update id="batchUpdate">
+        <foreach separator=";" item="topicClass" collection="topicClasses">
+            update topic_class
+            <set>
+                <trim suffixOverrides=",">
+                    <if test="topicClass.sid != null">
+                        sid = #{topicClass.sid},
+                    </if>
+                    <if test="topicClass.uid != null">
+                        uid = #{topicClass.uid},
+                    </if>
+                    <if test='topicClass.name != null and !"".equals(topicClass.name)'>
+                        name = #{topicClass.name},
+                    </if>
+                    <if test="topicClass.visible != null">
+                        visible = #{topicClass.visible},
+                    </if>
+                    <if test="topicClass.type != null">
+                        type = #{topicClass.type},
+                    </if>
+                    <if test='topicClass.createTime != null and !"".equals(topicClass.createTime)'>
+                        create_time = #{topicClass.createTime},
+                    </if>
+                </trim>
+            </set>
+            <where>
+                id = #{topicClass.id}
+            </where>
+        </foreach>
+    </update>
+
+    <!--前台查询话题带当前用户的关注信息-->
+    <select id="fSelectOne" resultMap="topicClass">
+        SELECT
+        a.*
+        <if test="uid !=null and uid != -1">
+            ,b.concern as concern_concern
+        </if>
+        FROM topic_class a
+        <if test="uid !=null and uid != -1">
+            LEFT JOIN
+            concern b
+            ON
+            b.oid = a.id
+            AND
+            b.uid = #{uid}
+        </if>
+        WHERE a.id = #{id}
+    </select>
+
+    <!--内容数目加1-->
+    <update id="updateCountAddOneById">
+    UPDATE topic_class set content_count = content_count+1 WHERE id = #{id}
+  </update>
+
+    <!--关注或取消关注-->
+    <update id="updateConcernAddValueById">
+    UPDATE topic_class set concern_count = concern_count+#{value} WHERE id = #{id}
+  </update>
+
+    <!--特殊功能-->
+
+    <!--前台根据所属模块查询当前用户已关注的话题列表-->
+    <select id="selectConcernList" resultMap="topicClass">
+        SELECT
+        a.*
+        <if test="uid != null and uid != -1">
+            ,b.concern as concern_concern
+        </if>
+        FROM
+        topic_class a
+        <if test="uid != null and uid != -1">
+            LEFT JOIN
+            concern b
+            ON
+            b.uid = #{uid}
+            AND
+            a.id = b.oid
+        </if>
+        WHERE
+        a.type = #{type}
+    </select>
+
+</mapper>

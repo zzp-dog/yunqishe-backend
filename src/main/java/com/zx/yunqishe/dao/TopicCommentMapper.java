@@ -1,5 +1,6 @@
 package com.zx.yunqishe.dao;
 
+import com.zx.yunqishe.dao.base.UpdateThumbCommonMapper;
 import com.zx.yunqishe.entity.TopicComment;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
@@ -7,7 +8,7 @@ import tk.mybatis.mapper.common.Mapper;
 import java.util.List;
 import java.util.Map;
 
-public interface TopicCommentMapper extends Mapper<TopicComment> , UpdateThumbCommonMapper{
+public interface TopicCommentMapper extends Mapper<TopicComment> , UpdateThumbCommonMapper {
 
     /**
      * 查询话题内容评论或评论

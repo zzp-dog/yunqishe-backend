@@ -1,5 +1,6 @@
 package com.zx.yunqishe.dao;
 
+import com.zx.yunqishe.dao.base.UpdateThumbCommonMapper;
 import com.zx.yunqishe.entity.TopicContent;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
@@ -7,7 +8,7 @@ import tk.mybatis.mapper.common.Mapper;
 import java.util.List;
 import java.util.Map;
 
-public interface TopicContentMapper extends Mapper<TopicContent> , UpdateThumbCommonMapper{
+public interface TopicContentMapper extends Mapper<TopicContent> , UpdateThumbCommonMapper {
     /**
      * 查询话题内容列表
      * @param map
@@ -23,12 +24,12 @@ public interface TopicContentMapper extends Mapper<TopicContent> , UpdateThumbCo
 
     /**
      * 获取论坛首部右侧tab中帖子列表
-     * @param wt 0-非问题（论坛）1-问题（问云）
-     * @param type 2-最近，3-精华，4-人气，5-随机
-     * @param tid - 所属话题id
+     * @param type1 0-非问题（圈子）1-问题（问云）
+     * @param type2 2-最近，3-精华，4-人气，5-随机
+     * @param pid - 所属话题id
      * @return
      */
-    List<TopicContent> fSelectList(@Param("wt") Byte wt, @Param("type") Integer type, @Param("tid") Integer tid);
+    List<TopicContent> fSelectList(@Param("type1") Byte type1, @Param("type2") Integer type2, @Param("pid") Integer pid);
 
     /**
      * 前台根据帖子id查帖子详情
@@ -56,4 +57,12 @@ public interface TopicContentMapper extends Mapper<TopicContent> , UpdateThumbCo
      * @param i
      */
     void updateViewAddValueById(@Param("id") Integer id, @Param("value") int i);
+
+    /**
+     * 根据用户id和动态类型查其话题动态
+     * @param uid
+     * @param type
+     * @return
+     */
+    List<TopicContent> fSelectDynamicList(@Param("uid") Integer uid, @Param("type") Byte type);
 }
