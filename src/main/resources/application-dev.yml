@@ -50,6 +50,11 @@ spring:
           enabled: true  #设置开启热部署
           additional-paths: src/main/java/** #重启目录
           exclude: WEB-INF/**
+    # 上传设置
+    servlet:
+        multipart:
+          enabled: true # 开启多文件上传
+          max-file-size: 10MB # 单个文件最大10MB
 
 mybatis:
     mapper-locations: classpath:mapper/*Mapper.xml

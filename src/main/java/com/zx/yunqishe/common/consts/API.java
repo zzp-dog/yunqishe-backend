@@ -114,4 +114,14 @@ public class API {
     public static final String EXCHANGE_ARG = "/exchangeArg";
     /** 支付记录表api前缀 */
     public static final String PAY = "/pay";
+    /** 站点信息 */
+    public static final String SITE_INFO = "/siteInfo";
+    /** 开关 */
+    public static final String SWITCH = "/switch";
+    /** 邮件设置 */
+    public static final String EMAIL_DISPOSE = "/emailDispose";
+    /** 邮件消息模板 */
+    public static final String EMAIL_TEMPLATE = "/emailTemplate";
+    /** 图片配置（如轮播等） */
+    public static final String IMAGE_DISPOSE = "/imageDispose";
 }

@@ -62,6 +62,8 @@ public class RequestLimitFilter implements Filter {
             }
             if (now - hostInfo[0] < this.MAX_INTERVAL) { // 连续请求的最大时间间隔
                 hostInfo[1]++;
+            } else { // 重置请求数为1
+                hostInfo[1] = 1l;
             }
             hostInfo[0] = now;
         }

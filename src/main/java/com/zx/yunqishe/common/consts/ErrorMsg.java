@@ -73,5 +73,8 @@ public class ErrorMsg {
     public static final Object NEED_CHARGE = "需要先支付云币哦~";
     /** 云币不足~ */
     public static final String COIN_SHORTAGE = "云币不足~";
-
+    /** 上传失败 */
+    public static final String UPLOAD_ERROR = "上传失败";
+    /** 至少保留一项！ */
+    public static final String RETAIN_ONE = "至少保留一项！";
 }

@@ -18,7 +18,7 @@
         <result column="nickname" property="nickname"/>
         <result column="avator" property="avator"/>
         <result column="account" property="account"/>
-        <result column="age" property="age"/>
+        <result column="birthday" property="birthday"/>
         <result column="sex" property="sex"/>
         <result column="qq" property="qq"/>
         <result column="wechat" property="wechat"/>
@@ -49,7 +49,7 @@
         <result column="nickname" property="nickname"/>
         <result column="avator" property="avator"/>
         <result column="account" property="account"/>
-        <result column="age" property="age"/>
+        <result column="birthday" property="birthday"/>
         <result column="sex" property="sex"/>
         <result column="qq" property="qq"/>
         <result column="wechat" property="wechat"/>
@@ -76,25 +76,20 @@
         </collection>
     </resultMap>
 
-    <!--存贮在session的基本用户-->
+    <!--基本用户-->
     <resultMap id="baseUser" type="User">
         <id column="id" property="id"/>
+        <result column="qq" property="qq"/>
+        <result column="sex" property="sex"/>
+        <result column="say" property="say"/>
+        <result column="bgm" property="bgm"/>
+        <result column="bgp" property="bgp"/>
         <result column="name" property="name"/>
         <result column="coin" property="coin"/>
+        <result column="phone" property="phone"/>
+        <result column="wechat" property="wechat"/>
         <result column="avator" property="avator"/>
-        <result column="nickname" property="nickname"/>
-        <result column="experience" property="experience"/>
-        <collection property="roleNames" ofType="string" javaType="list">
-            <result column="role_name"/>
-        </collection>
-    </resultMap>
-
-    <!--前台根据id查用户-->
-    <resultMap id="fUser" type="User">
-        <id column="id" property="id"/>
-        <result column="name" property="name"/>
-        <result column="coin" property="coin"/>
-        <result column="avator" property="avator"/>
+        <result column="birthday" property="birthday"/>
         <result column="nickname" property="nickname"/>
         <result column="experience" property="experience"/>
         <collection property="roleNames" ofType="string" javaType="list">
@@ -107,9 +102,10 @@
         SELECT
             a.id,
             a.sex,
-            a.name,
+            a.say,
             a.coin,
             a.avator,
+            a.birthday,
             a.nickname,
             a.experience,
             c.name AS role_name
@@ -122,16 +118,23 @@
     </select>
 
     <!--根据用户账号查基本信息-->
-    <select id="fSelectOne" resultMap="fUser">
+    <select id="fSelectOne" resultMap="baseUser">
         SELECT
-        a.id,
-        a.sex,
-        a.name,
-        a.coin,
-        a.avator,
-        a.address,
-        a.nickname,
-        a.experience,
+            a.id,
+            a.qq,
+            a.sex,
+            a.say,
+            a.bgm,
+            a.bgp,
+            a.name,
+            a.coin,
+            a.phone,
+            a.avator,
+            a.wechat,
+            a.address,
+            a.birthday,
+            a.nickname,
+            a.experience,
         c.name AS role_name
         FROM user a
         LEFT JOIN user_role b
@@ -263,8 +266,8 @@
                 <if test='user.avator != null and user.avator != ""'>
                     avator = #{user.avator},
                 </if>
-                <if test='user.age != null'>
-                    age = #{user.age},
+                <if test='user.birthday != null'>
+                    birthday = #{user.birthday},
                 </if>
                 <if test='user.address != null and user.address != ""'>
                     address = #{user.address},

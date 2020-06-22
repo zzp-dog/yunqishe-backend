@@ -52,6 +52,8 @@ public class ShiroConfig {
             API.USER+API.INSTALL,
             // 用户登录
             API.USER+API.LOGIN,
+            // 用户后台登录
+            API.USER + API.BACKEND + API.LOGIN,
             // 用户登出
             API.USER+API.LOGOUT,
 
@@ -95,7 +97,7 @@ public class ShiroConfig {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         // 设置登录api
-        shiroFilterFactoryBean.setLoginUrl("/user/login");
+        //shiroFilterFactoryBean.setLoginUrl("/user/login");
         // 设置开放api
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         for(String api: OPEN_APIS) {

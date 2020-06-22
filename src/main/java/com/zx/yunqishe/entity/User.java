@@ -114,6 +114,16 @@ public class User implements Serializable{
     private String say;
 
     /**
+     * 背景音乐
+     */
+    private String bgm;
+
+    /**
+     * 背景图像
+     */
+    private String bgp;
+
+    /**
      * 发表数量
      */
     @Column(name = "deliver_count")
@@ -135,9 +145,14 @@ public class User implements Serializable{
     private BigDecimal coin;
 
     /**
-     * 年龄
+     * 生日
      */
-    private Byte age;
+    @JsonFormat(
+            locale = "zh",
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    private Date birthday;
 
     /**
      * 上次登录时间

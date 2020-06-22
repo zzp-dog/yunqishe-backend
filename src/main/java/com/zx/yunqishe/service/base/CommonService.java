@@ -49,12 +49,10 @@ public class CommonService {
         if (null != user) {
             return user;
         }
-
         PrincipalCollection principalCollection = subject.getPrincipals();
         if (null == principalCollection) return null;
         String account = (String)principalCollection.getPrimaryPrincipal();
         if (null == account) return null;
-
         User baseUser = userMapper.selectBaseOneByAccount(account);
         //  查询是否会员过期
         Integer uid = baseUser.getId();
@@ -65,11 +63,9 @@ public class CommonService {
             Integer duration = vipArg.getDuration();
             Date openTime = pay.getPayTime();
             Long diff = DateUtil.diffNow(openTime);
-
             if (duration * 30 * 24 * 3600 * 1000 > diff) { // 未过期
                 continue;
             }
-
             // 过期了，则删除记录
             UserRole userRole = new UserRole();
             userRole.setUserId(uid);
@@ -84,7 +80,6 @@ public class CommonService {
                 roleNames.remove("svip");
             }
         }
-
         subject.getSession().setAttribute("me", baseUser);
         return baseUser;
     }

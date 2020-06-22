@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zx.yunqishe.dao.SiteSystemMapper">
-  <resultMap id="BaseResultMap" type="com.zx.yunqishe.entity.SiteSystem">
+<mapper namespace="com.zx.yunqishe.dao.SiteInfoMapper">
+  <resultMap id="BaseResultMap" type="com.zx.yunqishe.entity.SiteInfo">
     <!--
       WARNING - @mbg.generated
     -->

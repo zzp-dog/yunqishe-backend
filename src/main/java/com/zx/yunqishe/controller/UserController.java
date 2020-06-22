@@ -47,15 +47,22 @@ public class UserController {
     }
 
     /**
-     * 登录
-     * @param suser
+     * 前台登录
+     * @param user
      * @return
      */
     @Decrypt
     @RequestMapping(API.LOGIN)
-    public ResponseData login(@RequestBody @Valid SingleUser suser) {
-        return userService.login(suser);
-    }
+    public ResponseData login(SingleUser user) {return userService.login(user);}
+
+    /**
+     * 后台登录
+     * @param user
+     * @return
+     */
+    @Decrypt
+    @RequestMapping(API.BACKEND + API.LOGIN)
+    public ResponseData bLogin(@RequestBody SingleUser user) {return userService.bLogin(user);}
 
     /**
      * 发送验证码
@@ -270,5 +277,31 @@ public class UserController {
             @RequestParam(name = "pageSize", defaultValue = "10")Integer pageSize
     ){
         return userService.fSelectDynamicList(id, type, pageNum, pageSize);
+    }
+
+    /**
+     * 前台更新用户资料
+     * @param user
+     * @return
+     */
+    @Decrypt
+    @PostMapping(API.FRONTEND+API.UPDATE+API.ONE)
+    @RequiresUser
+    public ResponseData fUpdateOne(@RequestBody User user) {
+        userService.fUpdateOne(user);
+        return ResponseData.success();
+    }
+
+    /**
+     * 前台更新用户个性化信息
+     * @param user
+     * @return
+     */
+    @Decrypt
+    @PostMapping(API.FRONTEND+API.UPDATE+"/personalizeInfo")
+    @RequiresUser
+    public ResponseData fUpdatePersonalizeInfo(@RequestBody User user) {
+        userService.fUpdatePersonalizeInfo(user);
+        return ResponseData.success();
     }
 }

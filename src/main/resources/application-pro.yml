@@ -53,6 +53,10 @@ spring:
     mvc:
       servlet:
         load-on-startup: 0 #设置成0或正整数启动时就会初始化
+        # 上传设置
+        multipart:
+          enabled: true # 开启多文件上传
+          max-file-size: 10MB # 单个文件最大10MB
 
 mybatis:
     mapper-locations: classpath:mapper/*Mapper.xml

@@ -2,11 +2,12 @@ package com.zx.yunqishe.service;
 
 import com.github.pagehelper.PageHelper;
 import com.zx.yunqishe.common.consts.ErrorMsg;
+import com.zx.yunqishe.common.cache.AppCache;
 import com.zx.yunqishe.common.utils.CookieUtil;
 import com.zx.yunqishe.common.utils.DateUtil;
 import com.zx.yunqishe.common.utils.EmailUtil;
 import com.zx.yunqishe.common.utils.Generator;
-import com.zx.yunqishe.common.utils.entity.SendEmail;
+import com.zx.yunqishe.entity.EmailDispose;
 import com.zx.yunqishe.dao.*;
 import com.zx.yunqishe.entity.*;
 import com.zx.yunqishe.entity.core.ResponseData;
@@ -60,6 +61,9 @@ public class UserService extends CommonService{
 
     @Autowired
     private MediaContentService mediaContentService;
+
+    @Autowired
+    private EmailTemplateService emailTemplateService;
 
     // 创建任务计划线程池用于清除验证码
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
@@ -115,7 +119,6 @@ public class UserService extends CommonService{
         try {
             token.setRememberMe(true);
             subject.login(token);
-
             // 更新登录时间
             LocalDateTime ldt = LocalDateTime.now();
             String now = DateUtil.dataTime2str(ldt);
@@ -126,13 +129,27 @@ public class UserService extends CommonService{
             criteria.andEqualTo("account", account);
             criteria.andEqualTo("password", password);
             userMapper.updateByExampleSelective(user, example);
-
             // 查用户简易信息并返回给前端
             User baseUser = getCurrentBaseUser();
             return ResponseData.success().add("user", baseUser);
         } catch (Exception e) {
             return ResponseData.error(ErrorMsg.LOGIN_ERROR).add("cause", e);
         }
+    }
+
+    /**
+     * 后台登录(仅限管理员登录)
+     * @param suser
+     * @return
+     */
+    public ResponseData bLogin(SingleUser suser) {
+        String account = suser.getAccount();
+        User user = userMapper.selectBaseOneByAccount(account);
+        List<String> roleNames = user.getRoleNames();
+        if (!roleNames.contains("admin") || !roleNames.contains("superAdmin")) {
+            return ResponseData.error(ErrorMsg.LOGIN_ERROR);
+        }
+        return this.login(suser);
     }
 
     /**
@@ -182,20 +199,24 @@ public class UserService extends CommonService{
     public ResponseData sendCode(String email, HttpServletRequest req) throws Exception{
         // 生成验证码
         String code = Generator.getRandomNum(6);
-
+        // 查验证码发送模板
+        EmailTemplate emailTemplate = emailTemplateService.selectOneByType(1);
+        Byte async = emailTemplate.getAsync();
+        Integer expire = emailTemplate.getExpire();
+        String subject = emailTemplate.getSubject();
+        String template = emailTemplate.getTemplate();
+        String content = template.replaceFirst("\\$1", code);
+        // 配置发送邮件
+        EmailDispose emailDispose = AppCache.emailDispose;
+        emailDispose.setTo(email);
+        emailDispose.setAsync(async);
+        emailDispose.setSubject(subject);
+        emailDispose.setContent(content);
         // 用callable线程发送验证码
-        SendEmail sendEmail = new SendEmail();
-        sendEmail.setTo(email);
-        sendEmail.setCode(code);
-        sendEmail.setType("code");
-        sendEmail.setHost("smtp.qq.com");
-        sendEmail.setAuth("wohyfofluhtybdgb");
-        sendEmail.setFrom("1029512956@qq.com");
-        sendEmail.setSendTimeout(4000L); // 设置超时4s
-
         // 是否发送成功
-        Boolean b = new EmailUtil(sendEmail).SyncSend();
-        if (!b) {
+        Object b = new EmailUtil(emailDispose).send();
+        if (null != b && !(boolean)b) {
+            // 同步发送不通过
             return ResponseData.error(ErrorMsg.SEND_EMAIL_ERROR);
         }
         // 该验证码对应的时间戳
@@ -206,7 +227,6 @@ public class UserService extends CommonService{
         map.put("timeStamp", timeStamp);
         HttpSession session = req.getSession();
         session.setAttribute("codeMap", map);
-
         // 每次发送验证码都会产生一个计划任务
         //清除时根据时间戳判断是不是这个任务对应的验证码
         scheduledExecutorService.schedule(new Thread(()->{
@@ -214,8 +234,7 @@ public class UserService extends CommonService{
             if(Objects.nonNull(codeMapS) && timeStamp.equals(codeMapS.get("timeStamp"))){
                 session.removeAttribute("codeMap");
             }
-        }), 60, TimeUnit.SECONDS);
-
+        }), expire, TimeUnit.MILLISECONDS);
         return ResponseData.success();
     }
 
@@ -253,14 +272,6 @@ public class UserService extends CommonService{
      * @return
      */
     public User selectUserWithRolesWithPowers(String account) {
-        // 根据账号查所有角色和所有权限
-
-        // 因为数据库角色和权限都设计了父子结构，前端会展示成两棵树，
-        // 所以限制了以下两点，要么只有父，要么只有子
-        // 限制1：用户分配的角色不能有既有父角色，又有父角色的子角色，否则角色分配有问题
-        // 限制2：角色分配的权限不能既有父权限，又有父权限的子权限，否则权限分配也有问题
-        // 所以只要通过5表左连接查询就能查到用户所有角色和权限
-        // 注意：为角色分配权限的时候，要遵循父角色的权限大于子角色权限这个规则。
         return userMapper.selectUserWithRolesWithPowers(account);
     }
 
@@ -652,9 +663,9 @@ public class UserService extends CommonService{
                 continue;
             }
             Object[] o = getPrivilege(content);
-            if ((Boolean) o[1]) {
+            if ((Boolean) o[0]) { // 如果有权限
                 continue;
-            } else {
+            } else {              // 如果没有权限则置空
                 content.setCover(null);
                 content.setIntroduce(null);
             }
@@ -662,4 +673,43 @@ public class UserService extends CommonService{
         return ResponseData.success().add("contents", contents);
     }
 
+    /**
+     * 前台更新用户资料
+     * @param user$ 用户
+     * @return
+     */
+    public void fUpdateOne(User user$) {
+        Integer id = getUserId();
+        User user = new User();
+        user.setId(id);                         // 当前用户id
+        user.setQq(user$.getQq());              // qq - 可选
+        user.setSay(user$.getSay());            // 个人说明 - 可选
+        user.setSex(user$.getSex());            // 性别 - 可选
+        user.setName(user$.getName());          // 姓名 - 可选
+        user.setPhone(user$.getPhone());        // 手机号 - 可选
+        user.setAvator(user$.getAvator());      // 头像url - 可选
+        user.setWechat(user$.getWechat());      // 微信号 - 可选
+        user.setNickname(user$.getNickname());  // 昵称 - 必填
+        user.setBirthday(user$.getBirthday());  // 生日 - 可选
+        userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    /**
+     * 前台更新用户个性化信息
+     * @param user
+     */
+    public ResponseData fUpdatePersonalizeInfo(User user) {
+        String bgm = user.getBgm();
+        String bgp = user.getBgp();
+        if (null == bgm && null == bgp) {
+            return ResponseData.error();
+        }
+        User user$ = new User();
+        Integer id = getUserId();
+        user$.setId(id);
+        user$.setBgm(bgm);
+        user$.setBgp(bgp);
+        userMapper.updateByPrimaryKeySelective(user$);
+        return ResponseData.success();
+    }
 }
