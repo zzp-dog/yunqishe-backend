@@ -31,7 +31,7 @@ public class TopicContentController {
     private TopicContentService topicContentService;
 
     /**
-     * 分页查询话筒内容列表
+     * 分页查询话题内容列表
      * @param searchTitle
      * @param searchModule
      * @param searchStrategy
@@ -123,18 +123,18 @@ public class TopicContentController {
 
     /**
      * 前台获取话题内容列表(置顶靠前)
-     * @param type1 0-非问题（圈子）1-问题（问云）
      * @param pid - 所属话题，可选
-     * @param type2 1-全部，2-最新，3-精华，4-人气，5随机
+     * @param type1 0-非问题（圈子）1-问题（问云），可选
+     * @param type2 1-置顶，2-最新，3-精华，4-人气，5随机，可选
      * @param pageNum 哪一页
-     * @param pageSize list大小
+     * @param pageSize 每页大小
      * @return
      */
     @GetMapping(API.FRONTEND+API.SELECT+API.LIST)
     public ResponseData fSelectList(
-            @RequestParam(value = "type") Byte type1,
             @RequestParam(value = "pid", required = false) Integer pid,
-            @RequestParam(value = "type", defaultValue = "1") Integer type2,
+            @RequestParam(value = "type1", required = false) Byte type1,
+            @RequestParam(value = "type2", required = false) Integer type2,
             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             ) {

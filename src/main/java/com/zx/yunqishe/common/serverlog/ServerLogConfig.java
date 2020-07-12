@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
-@Profile("no")
+@Profile("dev")
 public class ServerLogConfig {
     @Autowired
     LoggableDispatcherServlet loggableDispatcherServlet;

@@ -73,4 +73,12 @@ public interface UserMapper extends Mapper<User> {
      * @return
      */
     User fSelectOne(Integer id);
+
+    /**
+     * 首页查询用户列表（只包含昵称，性别，头像和id）
+     * @param sex - -1-全部，1-男，2-女，3-未知
+     * @param type - -1-全部，1- 活跃，2-新人，3-随机
+     * @return
+     */
+    List<User> fSelectList(@Param("sex") Byte sex, @Param("type") Byte type);
 }

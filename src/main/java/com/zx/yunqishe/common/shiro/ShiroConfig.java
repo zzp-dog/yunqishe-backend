@@ -90,6 +90,9 @@ public class ShiroConfig {
             API.USER+API.FRONTEND+API.SELECT+"/active"+API.LIST,
             // 台查询话题分类之问答推荐分类列表
             API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+"/recommend"+API.LIST,
+
+            // 链接配置
+            API.IMAGE_DISPOSE + API.FRONTEND + API.SELECT + API.LIST
     };
 
     @Bean(name = "shiroFilter")

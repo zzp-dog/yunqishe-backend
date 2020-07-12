@@ -53,7 +53,7 @@ public class UserController {
      */
     @Decrypt
     @RequestMapping(API.LOGIN)
-    public ResponseData login(SingleUser user) {return userService.login(user);}
+    public ResponseData login(@RequestBody @Valid SingleUser user) {return userService.login(user);}
 
     /**
      * 后台登录
@@ -62,7 +62,7 @@ public class UserController {
      */
     @Decrypt
     @RequestMapping(API.BACKEND + API.LOGIN)
-    public ResponseData bLogin(@RequestBody SingleUser user) {return userService.bLogin(user);}
+    public ResponseData bLogin(@RequestBody @Valid SingleUser user) {return userService.bLogin(user);}
 
     /**
      * 发送验证码
@@ -237,6 +237,27 @@ public class UserController {
     @RequiresUser
     public ResponseData userBackendUpdateOne(@RequestBody User admin, HttpServletRequest req) {
         return userService.updateAdminBaseInfo(admin, req);
+    }
+
+    /**
+     * 首页查询用户列表（只包含id，性别，头像，昵称，经验）
+     * @param sex - -1-全部，1-男，2-女，3-未知
+     * @param type - -1-全部，1- 活跃，2-新人，3-随机
+     * @param pageNum 哪一页
+     * @param pageSize 页大小
+     * @return
+     */
+    @GetMapping(API.FRONTEND + API.SELECT + API.LIST)
+    public ResponseData fSelectList(
+            @RequestParam(name = "sex", required = false) Byte sex,
+            @RequestParam(name = "type", required = false) Byte type,
+            @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<User> users = userService.fSelectList(sex, type);
+        PageInfo pageInfo = new PageInfo<User>(users);
+        return ResponseData.success().add("users", pageInfo.getList());
     }
 
     /**

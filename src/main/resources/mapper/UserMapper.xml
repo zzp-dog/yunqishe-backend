@@ -33,13 +33,15 @@
         <result column="concern" property="concern"/>
         <result column="last_login_ip" property="lastLoginIp"/>
         <result column="last_logout_ip" property="lastLogoutIp"/>
+        <result column="regist_time" property="registTime"/>
+        <result column="cancel_time" property="cancelTime"/>
         <result column="last_login_time" property="lastLoginTime"/>
         <result column="last_logout_time" property="lastLogoutTime"/>
         <result column="last_login_device" property="lastLoginDevice"/>
         <result column="last_logout_device" property="lastLogoutDevice"/>
         <result column="partner" property="partner"/>
         <collection property="roleNames" ofType="string" javaType="list">
-            <result column="role_name"/>
+            <result column="role_name" property="roleName"/>
         </collection>
     </resultMap>
     <!--用户角色,一对多查询结果-->
@@ -92,13 +94,10 @@
         <result column="birthday" property="birthday"/>
         <result column="nickname" property="nickname"/>
         <result column="experience" property="experience"/>
-        <collection property="roleNames" ofType="string" javaType="list">
-            <result column="role_name"/>
-        </collection>
     </resultMap>
 
     <!--根据用户账号查基本信息-->
-    <select id="selectBaseOneByAccount" resultMap="baseUser">
+    <select id="selectBaseOneByAccount" resultMap="user">
         SELECT
             a.id,
             a.sex,
@@ -118,7 +117,7 @@
     </select>
 
     <!--根据用户账号查基本信息-->
-    <select id="fSelectOne" resultMap="baseUser">
+    <select id="fSelectOne" resultMap="user">
         SELECT
             a.id,
             a.qq,
@@ -325,5 +324,39 @@
         SET concern = concern + #{value}
         WHERE id = #{id}
     </update>
+
+    <!-- 首页查询用户列表（只包含id，性别，头像，昵称，经验） -->
+    <select id="fSelectList" resultMap="baseUser">
+        select
+            a.id,
+            a.sex,
+            a.avator,
+            a.nickname,
+            a.experience
+        FROM
+            user a
+        <where>
+          <if test="sex != null and sex != -1">
+              a.sex = #{sex}
+          </if>
+        </where>
+        <if test="type != null and type != -1">
+            ORDER BY
+        </if>
+        <choose>
+            <when test="type == 1">
+                a.last_login_time
+            </when>
+            <when test="type == 2">
+                a.regist_time
+            </when>
+            <when test="type == 3">
+                RAND()
+            </when>
+        </choose>
+        <if test="type != null and type != -1">
+            DESC
+        </if>
+    </select>
 
 </mapper>

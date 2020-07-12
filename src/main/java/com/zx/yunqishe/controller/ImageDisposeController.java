@@ -24,13 +24,14 @@ public class ImageDisposeController {
 
     /**
      * 后台分页查询图片配置列表
+     *
      * @param searchType 所属模块类型1-首页，2-圈子，3-微视频，默认1
      * @param pageNum
      * @param pageSize
      * @return
      */
     @RequiresRoles(value = {"superAdmin", "admin"})
-    @RequestMapping(API.BACKEND+API.SELECT+API.LIST)
+    @RequestMapping(API.BACKEND + API.SELECT + API.LIST)
     public ResponseData bSelectList(
             @RequestParam Byte searchType,
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -44,11 +45,12 @@ public class ImageDisposeController {
 
     /**
      * 根据id找该图片配置
+     *
      * @param id - 图片配置id
      * @return
      */
     @RequiresRoles(value = {"superAdmin", "admin"})
-    @RequestMapping(API.BACKEND+API.SELECT+API.ONE)
+    @RequestMapping(API.BACKEND + API.SELECT + API.ONE)
     public ResponseData bSelectOne(
             @RequestParam Integer id
     ) {
@@ -58,12 +60,13 @@ public class ImageDisposeController {
 
     /**
      * 根据id集合单个或批量删除图片配置
+     *
      * @param ids
      * @return
      */
     @Decrypt
     @RequiresRoles(value = {"superAdmin", "admin"})
-    @RequestMapping(API.BACKEND+API.BATCH+API.DELETE)
+    @RequestMapping(API.BACKEND + API.BATCH + API.DELETE)
     public ResponseData bBatchDelete(
             @RequestBody List<Integer> ids
     ) {
@@ -73,12 +76,13 @@ public class ImageDisposeController {
 
     /**
      * 单个或批量更新图片配置
+     *
      * @param imageDisposes - 图片配置集合
      * @return
      */
     @Decrypt
     @RequiresRoles(value = {"superAdmin", "admin"})
-    @RequestMapping(API.BACKEND+API.BATCH+API.UPDATE)
+    @RequestMapping(API.BACKEND + API.BATCH + API.UPDATE)
     public ResponseData bBatchUpdate(@RequestBody List<ImageDispose> imageDisposes) {
         imageDisposeService.batchUpdateById(imageDisposes);
         return ResponseData.success();
@@ -86,14 +90,28 @@ public class ImageDisposeController {
 
     /**
      * 单个插入
+     *
      * @param imageDispose - 图片配置
      * @return
      */
     @Decrypt
     @RequiresRoles(value = {"superAdmin", "admin"})
-    @RequestMapping(API.BACKEND+API.INSERT+API.ONE)
+    @RequestMapping(API.BACKEND + API.INSERT + API.ONE)
     public ResponseData bInsertOne(@RequestBody ImageDispose imageDispose) {
         imageDisposeService.insertOne(imageDispose);
         return ResponseData.success();
+    }
+
+    /////////////////////////////////////////////fronted/////////////////////////////
+
+    /**
+     * 前台根据配置类型查配置链接
+     * @param type 1-首页,2-圈子,3-知行，4-微媒体
+     * @return
+     */
+    @RequestMapping(API.FRONTEND + API.SELECT + API.LIST)
+    public ResponseData fSelectList(@RequestParam Byte type) {
+        List<ImageDispose> imageDisposes = imageDisposeService.selectListByType(type);
+        return ResponseData.success().add("imageDisposes", imageDisposes);
     }
 }

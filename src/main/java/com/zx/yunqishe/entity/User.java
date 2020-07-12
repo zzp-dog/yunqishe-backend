@@ -155,6 +155,28 @@ public class User implements Serializable{
     private Date birthday;
 
     /**
+     *  注册时间
+     */
+    @Column(name = "regist_time")
+    @JsonFormat(
+            locale = "zh",
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    private String registTime;
+
+    /**
+     *  注销时间
+     */
+    @Column(name = "cancel_time")
+    @JsonFormat(
+            locale = "zh",
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    private String cancelTime;
+
+    /**
      * 上次登录时间
      */
     @Column(name = "last_login_time")

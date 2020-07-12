@@ -140,7 +140,7 @@
         </foreach>
     </update>
 
-    <!-- 前台获取论坛帖子列表 type2：非2，3，4，5-全站（不用判断），2-最近，3-精华，4-人气，5-随机 -->
+    <!-- 前台获取论坛帖子列表 type2: 1-置顶，2-最近，3-精华，4-人气，5-随机 -->
     <select id="fSelectList" resultMap="topicContent">
         SELECT
         a.id,
@@ -161,32 +161,40 @@
         FROM
         topic_content a
         WHERE
-        type = #{type1}
-        AND
         visible = 1
         AND
         status = 2
+        <if test="type1 != null and type1 != -1">
+            AND
+            type = #{type1}
+        </if>
         <if test="pid != null and pid != -1">
             AND
             pid = #{pid}
         </if>
-        ORDER BY
-        top
-        <trim suffixOverrides=",">
-            <if test="type2 == 2">
-                ,create_time
-            </if>
-            <if test="type2 == 3">
-                ,good
-            </if>
-            <if test="type2 == 4">
-                ,thumbup_count
-            </if>
-            <if test="type2 == 5">
-                ,RAND()
-            </if>
-        </trim>
-        DESC
+        <if test="type2 != null and type2 != -1">
+            ORDER BY
+        </if>
+        <choose>
+            <when test="type2 == 1">
+                top
+            </when>
+            <when test="type2 == 2">
+                create_time
+            </when>
+            <when test="type2 == 3">
+                good
+            </when>
+            <when test="type2 == 4">
+                thumbup_count
+            </when>
+            <when test="type2 == 5">
+                RAND()
+            </when>
+        </choose>
+        <if test="type2 != null and type2 != -1">
+            DESC
+        </if>
     </select>
 
     <!--前台根据话题内容id查询话题内容 带收藏信息-->

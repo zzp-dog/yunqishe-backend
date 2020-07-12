@@ -712,4 +712,14 @@ public class UserService extends CommonService{
         userMapper.updateByPrimaryKeySelective(user$);
         return ResponseData.success();
     }
+
+    /**
+     * 首页查询用户列表（只包含昵称，性别，头像和id）
+     * @param sex - -1-全部，1-男，2-女，3-未知
+     * @param type - -1-全部，1- 活跃，2-新人，3-随机
+     * @return
+     */
+    public List<User> fSelectList(Byte sex, Byte type) {
+        return userMapper.fSelectList(sex, type);
+    }
 }
