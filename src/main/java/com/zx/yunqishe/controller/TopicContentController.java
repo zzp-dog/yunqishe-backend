@@ -126,6 +126,7 @@ public class TopicContentController {
      * @param pid - 所属话题，可选
      * @param type1 0-非问题（圈子）1-问题（问云），可选
      * @param type2 1-置顶，2-最新，3-精华，4-人气，5随机，可选
+     * @param isFree true - 只查询免费内容，false-查询所有
      * @param pageNum 哪一页
      * @param pageSize 每页大小
      * @return
@@ -135,10 +136,11 @@ public class TopicContentController {
             @RequestParam(value = "pid", required = false) Integer pid,
             @RequestParam(value = "type1", required = false) Byte type1,
             @RequestParam(value = "type2", required = false) Integer type2,
+            @RequestParam(value = "isFree", required = false) Boolean isFree,
             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             ) {
-        return topicContentService.fSelectList(type1, type2, pageNum, pageSize, pid);
+        return topicContentService.fSelectList(type1, type2, isFree, pageNum, pageSize, pid);
     }
 
     /**
@@ -153,16 +155,21 @@ public class TopicContentController {
     }
 
     /**
-     * 查询推荐内容
-     * @param type
-     * @param pageSize
+     * 前台查询推荐内容
+     * @param type - 0-圈子，1-问云
+     * @param pageNum - 当前页
+     * @param pageSize - 每页大小
      * @return
      */
     @GetMapping(API.FRONTEND+API.SELECT+"/recommend"+API.LIST)
     public ResponseData fSelectRecommendList(
             @RequestParam(name = "type") Integer type,
+            @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
     ) {
-        return topicContentService.fSelectRecommendList(type, pageSize);
+        PageHelper.startPage(pageNum, pageSize);
+        List<TopicContent> recommendTopicContents = topicContentService.fSelectRecommendList(type);
+        PageInfo<TopicContent> pageInfo = new PageInfo<>(recommendTopicContents);
+        return ResponseData.success().add("topicContents", pageInfo.getList());
     }
 }

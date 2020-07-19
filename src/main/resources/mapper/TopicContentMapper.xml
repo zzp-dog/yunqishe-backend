@@ -140,11 +140,12 @@
         </foreach>
     </update>
 
-    <!-- 前台获取论坛帖子列表 type2: 1-置顶，2-最近，3-精华，4-人气，5-随机 -->
+    <!-- 前台获取论话题内容简易信息列表 type2: 1-置顶，2-最近，3-精华，4-人气，5-随机 -->
     <select id="fSelectList" resultMap="topicContent">
         SELECT
         a.id,
         a.pid,
+        a.type,
         a.cover,
         a.title,
         a.strategy,
@@ -164,6 +165,9 @@
         visible = 1
         AND
         status = 2
+        <if test="isFree != null and isFree != false">
+            AND strategy = 1
+        </if>
         <if test="type1 != null and type1 != -1">
             AND
             type = #{type1}
@@ -245,6 +249,8 @@
             a.id = #{id}
             AND
             a.status = 2
+            AND
+            a.visible = 1
         </where>
     </select>
 

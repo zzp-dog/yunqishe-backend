@@ -88,6 +88,8 @@ public class ShiroConfig {
 
             // 前台查询活跃用户
             API.USER+API.FRONTEND+API.SELECT+"/active"+API.LIST,
+            // 首页用户列表
+            API.USER + API.FRONTEND + API.SELECT + API.LIST,
             // 台查询话题分类之问答推荐分类列表
             API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+"/recommend"+API.LIST,
 

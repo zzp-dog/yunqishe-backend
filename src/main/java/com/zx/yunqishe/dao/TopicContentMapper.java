@@ -27,9 +27,10 @@ public interface TopicContentMapper extends Mapper<TopicContent> , UpdateThumbCo
      * @param type1 0-非问题（圈子）1-问题（问云）
      * @param type2 2-最近，3-精华，4-人气，5-随机
      * @param pid - 所属话题id
+     * @param isFree
      * @return
      */
-    List<TopicContent> fSelectList(@Param("type1") Byte type1, @Param("type2") Integer type2, @Param("pid") Integer pid);
+    List<TopicContent> fSelectList(@Param("type1") Byte type1, @Param("type2") Integer type2, @Param("pid") Integer pid, @Param("isFree") Boolean isFree);
 
     /**
      * 前台根据帖子id查帖子详情

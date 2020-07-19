@@ -3,8 +3,10 @@ package com.zx.yunqishe.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zx.yunqishe.common.utils.JsoupUtil;
+import com.zx.yunqishe.dao.ConcernMapper;
 import com.zx.yunqishe.dao.TopicContentMapper;
 import com.zx.yunqishe.dao.TopicClassMapper;
+import com.zx.yunqishe.entity.Concern;
 import com.zx.yunqishe.entity.core.ResponseData;
 import com.zx.yunqishe.entity.TopicContent;
 import com.zx.yunqishe.service.base.CommonService;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +31,9 @@ public class TopicContentService extends CommonService{
 
     @Autowired
     private TopicContentMapper topicContentMapper;
+
+    @Autowired
+    private ConcernMapper concernMapper;
 
     /**
      * 查询话题内容
@@ -104,13 +110,13 @@ public class TopicContentService extends CommonService{
      * 获取话题内容列表
      * @param type1 0-非问题（圈子）1-问题（问云）
      * @param type2 1-全部，2-最新，3-精华，4-人气，5-随机
-     * @param pageNum 哪一页
-     * @param pageSize list大小
-     * @return
+     * @param isFree
+     *@param pageNum 哪一页
+     * @param pageSize list大小   @return
      */
-    public ResponseData fSelectList(Byte type1, Integer type2, Integer pageNum, Integer pageSize, Integer pid) {
+    public ResponseData fSelectList(Byte type1, Integer type2, Boolean isFree, Integer pageNum, Integer pageSize, Integer pid) {
         PageHelper.startPage(pageNum,pageSize);
-        List<TopicContent> topicContents = topicContentMapper.fSelectList(type1, type2, pid);
+        List<TopicContent> topicContents = topicContentMapper.fSelectList(type1, type2, pid,isFree);
         PageInfo<TopicContent> pageInfo = new PageInfo<>(topicContents);
         return ResponseData.success().add("topicContents", pageInfo.getList());
     }
@@ -131,21 +137,34 @@ public class TopicContentService extends CommonService{
 
     /**
      * 查询推荐内容
-     * @param type
-     * @param pageSize
+     * @param type 0-圈子，1-问云
      * @return
      */
-    public ResponseData fSelectRecommendList(Integer type, Integer pageSize) {
+    public List<TopicContent> fSelectRecommendList(Integer type) {
         Example example = new Example(TopicContent.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("type", type);
-        example.selectProperties(new String[] {
-                "id", "pid", "title",
-                "cover", "introduce"
-        });
-        PageHelper.startPage(1, pageSize);
-        List<TopicContent> topicContents = topicContentMapper.selectByExample(example);
-        return ResponseData.success().add("topicContents", topicContents);
+        example.selectProperties(new String[] {"id", "pid", "title", "cover", "introduce"});
+        Integer uid = getUserId();
+        // 未登录，查所有
+        if (null == uid) {
+            return topicContentMapper.selectByExample(example);
+        }
+        // 已登录，查关注
+        Example example1 = new Example(Concern.class);
+        Example.Criteria criteria1 = example1.createCriteria();
+        criteria1.andEqualTo("uid", uid);
+        criteria1.andEqualTo("type", type+2);
+        example1.selectProperties(new String[]{"oid"});
+        List<Concern> concerns = concernMapper.selectByExample(example1);
+        List<Integer> ids = new ArrayList<>(concerns.size());
+        for (Concern concern : concerns) {
+            ids.add(concern.getOid());
+        }
+        if (ids.size() > 0) {
+            criteria.andIn("id", ids);
+        }
+        return topicContentMapper.selectByExample(example);
     }
 
     /**
