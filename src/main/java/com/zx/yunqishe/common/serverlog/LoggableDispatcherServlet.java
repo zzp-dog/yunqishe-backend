@@ -19,6 +19,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 文件上传时，不能打印日志，会清空请求！！！
+ */
 @Component
 @Profile("dev")
 public class LoggableDispatcherServlet extends DispatcherServlet {

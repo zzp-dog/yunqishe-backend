@@ -8,10 +8,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name="image_dispose")
+@Table(name="banner_dispose")
 @Getter
 @Setter
-public class ImageDispose {
+public class BannerDispose {
     /**
      * 自增id
      */

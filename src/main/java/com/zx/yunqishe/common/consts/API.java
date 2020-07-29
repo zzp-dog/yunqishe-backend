@@ -123,5 +123,5 @@ public class API {
     /** 邮件消息模板 */
     public static final String EMAIL_TEMPLATE = "/emailTemplate";
     /** 图片配置（如轮播等） */
-    public static final String IMAGE_DISPOSE = "/imageDispose";
+    public static final String BANNER_DISPOSE = "/bannerDispose";
 }

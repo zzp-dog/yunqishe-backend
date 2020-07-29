@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
-@Profile("dev")
+@Profile("dev-no-fileUpload")
 public class ServerLogConfig {
     @Autowired
     LoggableDispatcherServlet loggableDispatcherServlet;

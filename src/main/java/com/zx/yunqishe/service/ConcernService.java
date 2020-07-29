@@ -73,31 +73,32 @@ public class ConcernService extends CommonService{
     }
 
     /**
-     * 前台用户批量关注
-     * @param ids
+     * 批量关注话题
+     * @param  type 0-圈子，1-问云
+     * @param  ids 话题id集合\
      * @return
      */
-    public ResponseData fQABatchInsert(List<Integer> ids) {
+    public ResponseData fBatchInsert(Byte type, List<Integer> ids) {
         Integer uid = getUserId();
         if (uid == null) {
             return ResponseData.error(ErrorMsg.KEEP_LOGIN_ERROR);
         }
-        // 先删除当前用户在问云模块关注的话题，且对应话题的关注数目-1
+        // 先删除当前用户关注的话题，且对应话题的关注数目-1
         Example example = new Example(Concern.class);
         Example.Criteria criteria1 = example.createCriteria();
         criteria1.andEqualTo("uid", uid);
-        criteria1.andEqualTo("type", 2);
+        criteria1.andEqualTo("type", type);
         concernMapper.deleteByExample(example);
         for (Integer oid : ids) {
             topicContentMapper.updateConcernAddValueById(oid, -1);
         }
 
-        // 再插入当前用户在问云模块关注的话题，且对应话题的关注数目+1
+        // 再插入当前用户关注的话题，且对应话题的关注数目+1
         for (Integer oid : ids) {
             Concern concern = new Concern();
             concern.setOid(oid);
             concern.setUid(uid);
-            concern.setType((byte)2);
+            concern.setType(type);
             concernMapper.insertSelective(concern);
             topicContentMapper.updateConcernAddValueById(oid,+1);
         }

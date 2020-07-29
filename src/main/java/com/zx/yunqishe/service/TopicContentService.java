@@ -109,16 +109,12 @@ public class TopicContentService extends CommonService{
     /**
      * 获取话题内容列表
      * @param type1 0-非问题（圈子）1-问题（问云）
-     * @param type2 1-全部，2-最新，3-精华，4-人气，5-随机
+     * @param type2 1-置顶，2-最新，3-精华，4-人气，5-随机，其他或不传为全部
      * @param isFree
-     *@param pageNum 哪一页
-     * @param pageSize list大小   @return
+     * @return
      */
-    public ResponseData fSelectList(Byte type1, Integer type2, Boolean isFree, Integer pageNum, Integer pageSize, Integer pid) {
-        PageHelper.startPage(pageNum,pageSize);
-        List<TopicContent> topicContents = topicContentMapper.fSelectList(type1, type2, pid,isFree);
-        PageInfo<TopicContent> pageInfo = new PageInfo<>(topicContents);
-        return ResponseData.success().add("topicContents", pageInfo.getList());
+    public List<TopicContent> fSelectList(Byte type1, Integer type2, Boolean isFree, Integer pid) {
+        return topicContentMapper.fSelectList(type1, type2, pid,isFree);
     }
 
     /**

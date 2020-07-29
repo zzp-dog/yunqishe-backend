@@ -140,7 +140,9 @@ public class TopicContentController {
             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             ) {
-        return topicContentService.fSelectList(type1, type2, isFree, pageNum, pageSize, pid);
+        PageHelper.startPage(pageNum, pageSize);
+        List<TopicContent> topicContents = topicContentService.fSelectList(type1, type2, isFree, pid);
+        return ResponseData.success().add("topicContents", topicContents);
     }
 
     /**
@@ -171,5 +173,36 @@ public class TopicContentController {
         List<TopicContent> recommendTopicContents = topicContentService.fSelectRecommendList(type);
         PageInfo<TopicContent> pageInfo = new PageInfo<>(recommendTopicContents);
         return ResponseData.success().add("topicContents", pageInfo.getList());
+    }
+
+    /**
+     * tab列表-查询话题简介，合并接口请求
+     * @param type 0-圈子，1-qa（问云）
+     * @param pageNum 当前页
+     * @param pageSize 页大小
+     * @return
+     */
+    @GetMapping(API.FRONTEND+API.SELECT+"/tab" + API.LIST)
+    public ResponseData fSelectTabList(
+            @RequestParam(name = "type") Byte type,
+            @RequestParam(name = "pageNum") Integer pageNum,
+            @RequestParam(name = "pageSize") Integer pageSize
+    ) {
+        // 置顶列表
+        PageHelper.startPage(pageNum, pageSize);
+        List<TopicContent> tops = topicContentService.fSelectList(type, 1, true, -1);
+        // 最新列表
+        PageHelper.startPage(pageNum, pageSize);
+        List<TopicContent> news = topicContentService.fSelectList(type, 2, true, -1);
+        // 精华列表
+        PageHelper.startPage(pageNum, pageSize);
+        List<TopicContent> creams = topicContentService.fSelectList(type, 3, true, -1);
+        // 人气列表
+        PageHelper.startPage(pageNum, pageSize);
+        List<TopicContent> populars = topicContentService.fSelectList(type, 4, true, -1);
+        // 随机列表
+        PageHelper.startPage(pageNum, pageSize);
+        List<TopicContent> randoms = topicContentService.fSelectList(type, 5, true, -1);
+        return ResponseData.success().add("tops", tops).add("news", news).add("creams", creams).add("populars", populars).add("randoms", randoms);
     }
 }

@@ -7,10 +7,7 @@ import com.zx.yunqishe.entity.core.ResponseData;
 import com.zx.yunqishe.service.ConcernService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -35,13 +32,17 @@ public class ConcernController {
     }
 
     /**
-     * 前台用户批量关注
-     * @param ids
+     * 批量关注话题
+     * @param  type 0-圈子，1-问云
+     * @param  ids 话题id集合
      * @return
      */
     @Decrypt
-    @PostMapping(API.FRONTEND+"/qa"+API.BATCH+API.INSERT)
-    public ResponseData fQABatchInsert(@RequestBody List<Integer> ids) {
-        return concernService.fQABatchInsert(ids);
+    @PostMapping(API.FRONTEND+API.BATCH+API.INSERT)
+    public ResponseData fQABatchInsert(
+            @RequestParam(name = "type") Byte type,
+            @RequestBody List<Integer> ids
+    ) {
+        return concernService.fBatchInsert(type, ids);
     }
 }

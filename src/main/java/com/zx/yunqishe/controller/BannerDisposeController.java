@@ -4,9 +4,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zx.yunqishe.common.annotation.Decrypt;
 import com.zx.yunqishe.common.consts.API;
-import com.zx.yunqishe.entity.ImageDispose;
+import com.zx.yunqishe.entity.BannerDispose;
 import com.zx.yunqishe.entity.core.ResponseData;
-import com.zx.yunqishe.service.ImageDisposeService;
+import com.zx.yunqishe.service.BannerDisposeService;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(API.IMAGE_DISPOSE)
-public class ImageDisposeController {
+@RequestMapping(API.BANNER_DISPOSE)
+public class BannerDisposeController {
     @Autowired
-    private ImageDisposeService imageDisposeService;
+    private BannerDisposeService bannerDisposeService;
 
     /**
      * 后台分页查询图片配置列表
      *
-     * @param searchType 所属模块类型1-首页，2-圈子，3-微视频，默认1
+     * @param searchType 所属模块类型1-首页，2-圈子，3-问云，4-执行，5-微视频 ，默认1
      * @param pageNum
      * @param pageSize
      * @return
@@ -38,8 +38,8 @@ public class ImageDisposeController {
             @RequestParam(defaultValue = "10") Integer pageSize
     ) {
         PageHelper.startPage(pageNum, pageSize);
-        List<ImageDispose> imageDisposes = imageDisposeService.selectListByType(searchType);
-        PageInfo<ImageDispose> pageInfo = new PageInfo<>(imageDisposes);
+        List<BannerDispose> bannerDisposes = bannerDisposeService.selectListByType(searchType);
+        PageInfo<BannerDispose> pageInfo = new PageInfo<>(bannerDisposes);
         return ResponseData.success().add("pageInfo", pageInfo);
     }
 
@@ -54,8 +54,8 @@ public class ImageDisposeController {
     public ResponseData bSelectOne(
             @RequestParam Integer id
     ) {
-        ImageDispose imageDispose = imageDisposeService.selectOneById(id);
-        return ResponseData.success().add("imageDispose", imageDispose);
+        BannerDispose bannerDispose = bannerDisposeService.selectOneById(id);
+        return ResponseData.success().add("bannerDispose", bannerDispose);
     }
 
     /**
@@ -70,35 +70,35 @@ public class ImageDisposeController {
     public ResponseData bBatchDelete(
             @RequestBody List<Integer> ids
     ) {
-        imageDisposeService.batchDeleteById(ids);
+        bannerDisposeService.batchDeleteById(ids);
         return ResponseData.success();
     }
 
     /**
      * 单个或批量更新图片配置
      *
-     * @param imageDisposes - 图片配置集合
+     * @param bannerDisposes - 图片配置集合
      * @return
      */
     @Decrypt
     @RequiresRoles(value = {"superAdmin", "admin"})
     @RequestMapping(API.BACKEND + API.BATCH + API.UPDATE)
-    public ResponseData bBatchUpdate(@RequestBody List<ImageDispose> imageDisposes) {
-        imageDisposeService.batchUpdateById(imageDisposes);
+    public ResponseData bBatchUpdate(@RequestBody List<BannerDispose> bannerDisposes) {
+        bannerDisposeService.batchUpdateById(bannerDisposes);
         return ResponseData.success();
     }
 
     /**
      * 单个插入
      *
-     * @param imageDispose - 图片配置
+     * @param BannerDispose - 图片配置
      * @return
      */
     @Decrypt
     @RequiresRoles(value = {"superAdmin", "admin"})
     @RequestMapping(API.BACKEND + API.INSERT + API.ONE)
-    public ResponseData bInsertOne(@RequestBody ImageDispose imageDispose) {
-        imageDisposeService.insertOne(imageDispose);
+    public ResponseData bInsertOne(@RequestBody BannerDispose BannerDispose) {
+        bannerDisposeService.insertOne(BannerDispose);
         return ResponseData.success();
     }
 
@@ -111,7 +111,7 @@ public class ImageDisposeController {
      */
     @RequestMapping(API.FRONTEND + API.SELECT + API.LIST)
     public ResponseData fSelectList(@RequestParam Byte type) {
-        List<ImageDispose> imageDisposes = imageDisposeService.selectListByType(type);
-        return ResponseData.success().add("imageDisposes", imageDisposes);
+        List<BannerDispose> bannerDisposes = bannerDisposeService.selectListByType(type);
+        return ResponseData.success().add("bannerDisposes", bannerDisposes);
     }
 }

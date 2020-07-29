@@ -56,6 +56,10 @@ public class ShiroConfig {
             API.USER + API.BACKEND + API.LOGIN,
             // 用户登出
             API.USER+API.LOGOUT,
+            // 前台查询活跃用户
+            API.USER+API.FRONTEND+API.SELECT+"/active"+API.LIST,
+            // 首页用户列表
+            API.USER + API.FRONTEND + API.SELECT + API.LIST,
 
             // 前台查询经验等级表
             API.LEVEL+API.FRONTEND+API.SELECT+API.LIST,
@@ -69,6 +73,10 @@ public class ShiroConfig {
             API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+API.ONE,
             // 前台查询话题内容列表
             API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+API.LIST,
+            // 台查询话题分类之问答推荐分类列表
+            API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+"/recommend"+API.LIST,
+            // 前台查询tab列表，接口请求合并
+            API.TOPIC_CONTENT + API.FRONTEND + API.SELECT + "/tab" +API.LIST,
             // 前台查询话题内容回复列表
             API.TOPIC_COMMENT+API.FRONTEND+API.SELECT+API.LIST,
 
@@ -86,15 +94,8 @@ public class ShiroConfig {
             // 请求媒体内容
             API.MEDIA_CONTENT+API.FRONTEND+API.SELECT+API.ONE,
 
-            // 前台查询活跃用户
-            API.USER+API.FRONTEND+API.SELECT+"/active"+API.LIST,
-            // 首页用户列表
-            API.USER + API.FRONTEND + API.SELECT + API.LIST,
-            // 台查询话题分类之问答推荐分类列表
-            API.TOPIC_CONTENT+API.FRONTEND+API.SELECT+"/recommend"+API.LIST,
-
-            // 链接配置
-            API.IMAGE_DISPOSE + API.FRONTEND + API.SELECT + API.LIST
+            // banner配置
+            API.BANNER_DISPOSE + API.FRONTEND + API.SELECT + API.LIST
     };
 
     @Bean(name = "shiroFilter")

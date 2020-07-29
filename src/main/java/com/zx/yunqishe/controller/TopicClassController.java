@@ -63,15 +63,15 @@ public class TopicClassController {
     /**
      * 查询话题分类
      * @param type 0-圈子，1-问答
-     * @param maxSize type为1时默认为7(因为UI原因，后期改进)
+     * @param max type为1时默认为7(因为UI原因，后期改进)
      * @return
      */
     @GetMapping(API.FRONTEND+API.SELECT+API.LIST)
     public ResponseData fSelectList(
             @RequestParam(name="type") Integer type,
-            @RequestParam(name="maxSize", defaultValue = "7") Integer maxSize
+            @RequestParam(name="max", defaultValue = "7") Integer max
     ) {
-        return topicClassService.fSelectList(type,maxSize);
+        return topicClassService.fSelectList(type,max);
     }
 
     /**

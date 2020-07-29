@@ -133,7 +133,7 @@ public class TopicClassService extends CommonService{
         Map<String, Object> map = new HashMap<>();
         List<TopicClass> concerns = new ArrayList<>();
         List<TopicClass> recommends = new ArrayList<>();
-        map.put("concern", concerns); // 已关注
+            map.put("concern", concerns); // 已关注
         map.put("recommend", recommends); // 未关注
         for (TopicClass topicClass : topicClasses) {
             if (null == topicClass.getConcernInfo() || topicClass.getConcernInfo().getConcern() == 0) {

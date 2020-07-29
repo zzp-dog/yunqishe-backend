@@ -23,10 +23,9 @@ public interface TopicContentMapper extends Mapper<TopicContent> , UpdateThumbCo
     void batchUpdateTopicContent(@Param(value = "contents") List<TopicContent> topicContents);
 
     /**
-     * 获取论坛首部右侧tab中帖子列表
+     * 获取话题内容列表
      * @param type1 0-非问题（圈子）1-问题（问云）
-     * @param type2 2-最近，3-精华，4-人气，5-随机
-     * @param pid - 所属话题id
+     * @param type2 1-置顶，2-最新，3-精华，4-人气，5-随机，其他或不传为全部
      * @param isFree
      * @return
      */
